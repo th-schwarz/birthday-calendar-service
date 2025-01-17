@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.CalendarBuilder;
@@ -81,14 +80,14 @@ public class CalHandler {
    *     or deleting resources.
    */
   void clearRemoteCalendar() throws IOException {
-    Set<URI> calendarEntries = getCalendarEntriesToDelete();
+    Set<URI> calendarEntries = getRemoteEventsToDelete();
     if (!calendarEntries.isEmpty()) {
       log.info("{} calendar items found to be removed", calendarEntries.size());
-      deleteCalendarEntries(calendarEntries);
+      deleteRemoteEvents(calendarEntries);
     }
   }
 
-  private Set<URI> getCalendarEntriesToDelete() throws IOException {
+  private Set<URI> getRemoteEventsToDelete() throws IOException {
     List<DavResource> davResources = sardine.list(davConf.calUrl());
     Set<URI> calendarEntries = new HashSet<>();
     for (DavResource resource : davResources) {
@@ -98,19 +97,22 @@ public class CalHandler {
             resource.getName(),
             resource.getDisplayName());
         VEvent birthdayEvent = convert(resource);
-        if (birthdayEvent != null) {
-          Optional<Categories> optCategories = birthdayEvent.getCategories();
-          if (optCategories.isPresent()
-              && optCategories.get().getCategories().getTexts().contains(conf.calendarCategory())) {
-            calendarEntries.add(resource.getHref());
-          }
+        if (birthdayEvent != null && matchCategory(birthdayEvent)) {
+          calendarEntries.add(resource.getHref());
         }
       }
     }
     return calendarEntries;
   }
 
-  private void deleteCalendarEntries(Set<URI> calendarEntries) throws IOException {
+  private boolean matchCategory(VEvent event) {
+    return event
+        .getCategories()
+        .map(categories -> categories.getCategories().getTexts().contains(conf.calendarCategory()))
+        .orElse(false);
+  }
+
+  private void deleteRemoteEvents(Set<URI> calendarEntries) throws IOException {
     for (URI uri : calendarEntries) {
       String path = davConf.getBaseUrl() + uri.getPath();
       sardine.delete(path);
@@ -148,7 +150,7 @@ public class CalHandler {
   void uploadEventsToCalendar(List<Person> people) {
     for (Person person : people) {
       try {
-        Calendar personCal = createCalendarEvent(person);
+        Calendar personCal = buildPersonBirthdayCalendar(person);
         String eventContent = personCal.toString();
 
         // upload event
@@ -165,7 +167,7 @@ public class CalHandler {
     }
   }
 
-  private Calendar createCalendarEvent(Person person) {
+  private Calendar buildPersonBirthdayCalendar(Person person) {
     Version version = new Version();
     version.setValue(Version.VALUE_2_0);
     Calendar calendar = new Calendar();
@@ -173,7 +175,7 @@ public class CalHandler {
     calendar.add(version);
     calendar.add(new Method(Method.VALUE_PUBLISH));
 
-    VEvent birthdayEvent = buildEvent(person);
+    VEvent birthdayEvent = buildBirthdayEvent(person);
     calendar.add(birthdayEvent);
     return calendar;
   }
@@ -184,7 +186,7 @@ public class CalHandler {
    * @param person the Person object containing the birthday and other related information
    * @return the constructed VEvent representing the person's birthday
    */
-  private VEvent buildEvent(Person person) {
+  private VEvent buildBirthdayEvent(Person person) {
     String summary = eventConf.generateSummary(person);
     VEvent birthdayEvent = new VEvent(person.birthday(), summary);
     birthdayEvent.add(uidGenerator.generateUid());
