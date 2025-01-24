@@ -5,9 +5,8 @@
 /.factorypath
 /.springBeans
 /.idea
+*.iml
 
 # local files
 /info.txt
 bcg.yml
-/vdirsyncer**
-/cal
