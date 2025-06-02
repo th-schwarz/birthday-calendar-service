@@ -12,7 +12,7 @@ image:https://img.shields.io/github/license/th-schwarz/BCG["License badge for BC
 Give it a try!
 https://github.com/th-schwarz/BCG/releases[image:https://img.shields.io/github/v/release/th-schwarz/BCG?include_prereleases[GitHub
 release (latest by date including pre-releases)]]         image:https://img.shields.io/github/downloads/th-schwarz/BCG/total[GitHub Downloads (all assets, all releases)] +
-Before testing BCG, please create a backup of the calendar to be used!
+Before testing BCG, please create a backup of the calendar to be used! It is a good idea to use an additional calendar for birthdays.
 
 == Preface
 
