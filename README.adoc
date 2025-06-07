@@ -21,7 +21,7 @@ BCG (Birthday Calendar Generator) is a Java Spring Boot application for creating
 
 At the moment BCG is not acting very intelligent, i.e. the events in the birthday calendar are always deleted and then recreated.
 
-If you find a bug or certain features are missing, don’t hesitate to file an issue on https://github.com/th-schwarz/BCG/issues[Github].
+If you find a bug or certain features are missing, don’t hesitate to file an issue on https://github.com/th-schwarz/BirthdayCalendarCreator/issues[Github].
 
 == Disclaimer
 
