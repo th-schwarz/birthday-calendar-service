@@ -44,21 +44,20 @@ Here is the suggested file structure:
 ----
 ├── /opt/bcg
 │   ├── bcg.yml    (individual configuration)
-│   ├── bcg-1.1.0.jar
-│   ├── bcg.jar -> bcg-1.1.0.jar
+│   ├── bcg.jar
 │   ├── logback.xml    (logback configuration)
 ----
 *bcg.yml* defines the individual properties. The file is read by default and will be merged with the default properties in the classpath, therefore the file can be kept as small as possible. A minimal configuration example can be found further below. If the file is inside the working directory, it is loaded automatically.  +
 The complete configuration settings can be found link:docs/bcg-configuration.adoc[here].
 
-=== Minimal configuration example
+=== Configuration
 
-The most mandatory individual configuration concerns the dav setting. These should be self-explanatory. An example for your individual properties file `bcg.yml`:
+Use the individual properties file `bcg.yml` to set the mandatory dav settings and to override default settings.
+
+==== Dav
 
 [source,yaml]
 ----
-bcg:
-  calendar-category: Birthday
 dav:
   user: dev
   password: strong
@@ -70,6 +69,13 @@ dav:
 *As this value is used to delete and create birthdays, the value must be set correctly initially and must not be changed!*
 - `dav.card-url`: The address book URL from which birthdays are read.
 - `dav.cal-url`: The url of the birthday calendar which must be created. _To be on the safe side it's a good idea to use an extra birthday calendar! But it is not mandatory since https://github.com/th-schwarz/BCG/issues/2[A remote event should only be deleted if its categories contain the defined birthday category.]_
+- `dav.run-on-start`:
+
+=== Event and alarm configuration
+
+[source,yaml]
+----
+----
 
 == Start
 
