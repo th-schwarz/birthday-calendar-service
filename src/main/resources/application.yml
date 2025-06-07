@@ -13,3 +13,4 @@ event:
   summary: "🎂 ~first-name~ ~last-name~"
   description: "Birthday: ~birthday~"
   date-format: yyyy-MM-dd
+  alarm: 1d
