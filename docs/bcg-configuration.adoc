@@ -13,31 +13,36 @@ Below all default settings are listed.
 
 [source,yaml]
 // include is disabled on github
-// application.yml 2024-11
+// application.yml 2025-06
 ----
 bcg:
   product: BirthdayCalendarGenerator
   calendar-category: Birthday
   run-on-start: true
-  cron: "0 30 4 * * SUN"
+  cron: "0 30 4 * * *"
 
 event:
   summary: "🎂 ~first-name~ ~last-name~"
   description: "Birthday: ~birthday~"
   date-format: yyyy-MM-dd
+  alarm: 1d
 ----
 
 - `bcg.product`: Name of the product used in the created calendar files, known as 'prodId'.
-- `bcg.calendar-category`: The category of the birthday event.
+- `bcg.calendar-category`: The value depends on the categories of the caldav server and its localization. +
+*as this value is used to delete and create birthdays, the value must be set correctly initially and must not be changed!*
 - `bcg.run-on-start`: The creation of the birthday calendar will be triggered directly at the start of the service.
 
 Event settings:
 
-- `event.summary`: The summary of the event.
-- `event.description`: The description of the event.
-- `event.date-format`: The format of the placeholder _\~birthday~_.
+- `event.summary`: The title of the birthday event.
+- `event.description`: The description of the birthday event.
+- `event.date-format`: The format of the birthday date.
+- `event.alarm`: Triggers a notification **before** the birthday event. Expected format: <number>[dh] +
+d=day, h=hours +
+E.g.: _12h_ triggers a notification 12 hours before the birthday event.
 
-There are several placeholders which can be used in some event properties. The names speak for themselves.
+The placeholders '&#126;first-name&#126;', '&#126;last-name&#126;' and '&#126;birthday&#126;' are self-explain placeholder hat can be used in 'description' and 'summary'.
 
 == Individual settings
 
@@ -49,3 +54,7 @@ dav:
   cal-url: https://dav.my-domain.org/SOGo/dav/dav-user/Calendar/46-12345678-5-87654321/
   card-url: https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/personal/
 ----
+
+- `dav.user`, `dav.password`: Authentication credentials for the dav server.
+- `dav.card-url`: The address book URL from which birthdays are read.
+- `dav.cal-url`: The url of the birthday calendar which must be created. _To be on the safe side, it's a good idea to use an extra birthday calendar! But it is not mandatory since https://github.com/th-schwarz/BirthdayCalendarCreator/issues/2[A remote event should only be deleted if its categories contain the defined birthday category.]_
