@@ -4,7 +4,7 @@
 :source-highlighter: highlightjs
 :highlightjs-languages: yaml,console
 
-= BCG :: Birthday Calendar Generator
+= Birthday Calendar Generator
 
 image:https://github.com/th-schwarz/BCG/actions/workflows/maven.yml/badge.svg["GitHub CI Build Status",link="https://github.com/th-schwarz/BCG/actions/workflows/maven.yml"]
 image:https://img.shields.io/github/license/th-schwarz/BCG["License badge for BCG",link="https://github.com/th-schwarz/BCG/blob/develop/LICENSE"]
