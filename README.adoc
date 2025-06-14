@@ -33,6 +33,12 @@ Successfully tested so far:
 - sogo 5.12.0 (mailcow-dockerized 2025-05)
 - sogo 5.1.12 (mailcow-dockerized 2024-11b)
 
+== Changelog
+- v1.2.0 +
+  issue#3 reminder for all birthday events
+- v1.1.0 +
+  issue#2: A remote event should only be deleted if its categories contain the defined birthday category.
+
 == Basic Workflow
 
 The Birthday Calendar Generator (BCG) is an application designed to generate a birthday calendar from the contact information stored in a CardDAV address book and upload it to a CalDAV calendar. The working process is built upon key parts and is automated using scheduling methods.
