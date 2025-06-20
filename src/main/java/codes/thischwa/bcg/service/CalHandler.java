@@ -177,7 +177,6 @@ public class CalHandler {
       log.info("No birthday events to update found. Sync stopped.");
       return;
     }
-    log.info("Found {} changed or missing birthday events.", changedOrMissingPeople.size());
 
     Map<String, URI> existingEventUris = new HashMap<>();
     List<DavResource> davResources = sardine.list(davConf.calUrl());
@@ -191,10 +190,12 @@ public class CalHandler {
 
     for (Person person : changedOrMissingPeople) {
       Calendar personCal = buildPersonBirthdayCalendar(person);
+      String uuid = generatePersonUUID(person);
+      sardine.delete(davConf.getBaseUrl() + existingEventUris.get(uuid).getPath());
       uploadSingleEvent(personCal, person);
       log.info("Added or updated event for: {}", person.getFullName());
 
-      existingEventUris.remove(generatePersonUUID(person));
+      existingEventUris.remove(uuid);
     }
     for (URI uri : existingEventUris.values()) {
       sardine.delete(davConf.getBaseUrl() + uri.getPath());
@@ -204,7 +205,6 @@ public class CalHandler {
 
   private List<Person> findChangedOrMissingBirthdays(List<Person> currentPeople)
       throws IOException {
-    // Schritt 1: Lade alle bestehenden Geburtstagsereignisse aus dem Kalender
     Map<String, VEvent> existingEvents = new HashMap<>();
     List<DavResource> davResources = sardine.list(davConf.calUrl());
     for (DavResource resource : davResources) {
@@ -229,6 +229,7 @@ public class CalHandler {
       }
     }
 
+    log.info("Found {} changed or missing birthday events", changedOrMissingPeople.size());
     return changedOrMissingPeople;
   }
 
@@ -242,11 +243,10 @@ public class CalHandler {
   }
 
   private String extractEventId(URI eventUri) {
-    // Extrahiere die UUID aus der URI des Kalendereintrags
     String path = eventUri.getPath();
     String[] segments = path.split("/");
-    String fileName = segments[segments.length - 1]; // Name der Datei extrahieren
-    return fileName.replace(".ics", ""); // ".ics" entfernen, um die ID zu erhalten
+    String fileName = segments[segments.length - 1];
+    return fileName.replace(".ics", "");
   }
 
   private String generatePersonUUID(Person person) {
@@ -266,21 +266,6 @@ public class CalHandler {
         eventContent.getBytes(StandardCharsets.UTF_8))) {
       sardine.put(eventUrl, inputStream);
       log.debug("Uploaded birthday event for '{}': {}", person.getFullName(), eventUrl);
-    }
-  }
-
-  private VEvent getDavResource(URI uri) {
-    try (InputStream inputStream = sardine.get(davConf.getBaseUrl() + uri.getPath())) {
-      CalendarBuilder builder = new CalendarBuilder();
-      Calendar calendar = builder.build(inputStream);
-      if (!calendar.getComponents().isEmpty() &&
-          calendar.getComponents().get(0) instanceof VEvent) {
-        return (VEvent) calendar.getComponents().get(0);
-      } else {
-        throw new IllegalArgumentException("No valid VEvent found in calendar resource.");
-      }
-    } catch (Exception e) {
-      throw new IllegalArgumentException("Error parsing DAV resource", e);
     }
   }
 }
