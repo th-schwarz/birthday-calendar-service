@@ -165,13 +165,11 @@ public class CalHandler {
 
       // create trigger with VALUE=DURATION explicitly
       Trigger trigger = new Trigger(eventConf.getAlarmDuration());
-      trigger.getParameters().add(Value.DURATION);
-
+      trigger.add(Value.DURATION);
       alarm.add(trigger);
       alarm.add(new Action(Action.VALUE_DISPLAY));
       alarm.add(new Description(description));
       alarm.add(summary);
-
       birthdayEvent.add(alarm);
     }
 
