@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,9 +86,8 @@ public class CalHandler {
   }
 
   private boolean matchCategory(VEvent event) {
-    return event.getCategories()
-        .map(categories -> categories.getCategories().getTexts().contains(conf.calendarCategory()))
-        .orElse(false);
+    return event.getCategories().stream().anyMatch(
+        categories -> categories.getCategories().getTexts().contains(conf.calendarCategory()));
   }
 
   private void deleteRemoteEvents(Set<URI> calendarEntries) throws IOException {
@@ -265,12 +265,8 @@ public class CalHandler {
 
   private boolean isEventUpToDate(VEvent event, Person person) {
     LocalDate personBirthday = person.birthday();
-    Optional<DtStart<LocalDate>> dtStart = event.getDateTimeStart();
-    if (!dtStart.isPresent()) {
-      log.warn("Event for {} has no start date", person.getFullName());
-      return false;
-    }
-    LocalDate eventBirthday = dtStart.get().getDate();
+    DtStart<LocalDate> dtStart = event.getDateTimeStart();
+    LocalDate eventBirthday = dtStart.getDate();
     return personBirthday.equals(eventBirthday);
   }
 
