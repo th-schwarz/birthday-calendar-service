@@ -39,6 +39,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Method;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
@@ -177,7 +178,7 @@ public class CalHandler {
     birthdayEvent.add(new Categories(conf.calendarCategory()));
     birthdayEvent.add(new Transp(Transp.VALUE_TRANSPARENT));
     birthdayEvent.add(new Description(description));
-
+    birthdayEvent.add(new Status(Status.VALUE_CONFIRMED));
     return birthdayEvent;
   }
 
