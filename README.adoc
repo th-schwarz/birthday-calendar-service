@@ -49,8 +49,7 @@ The Birthday Calendar Generator (BCG) is an application designed to generate a b
 === General Steps
 
 . Address Book Access
-* The application begins by authenticating with the CardDAV server using configured credentials.
-* It fetches all contacts from the specified address book URL and processes each contact to extract relevant information, such as names and birthdays.
+* The application fetches all contacts from the specified address book URL and processes each contact to extract relevant information, such as names and birthdays.
 
 . Event Processing
 * The collected birthday data is processed to create calendar events. Each contact's birthday is transformed into a recurring event that adheres to the iCalendar format.
@@ -87,6 +86,7 @@ The most important settings are:
 ----
 bcg:
   calendar-category: Birthday
+  cron: "0 30 4 * * *"  # default
 dav:
   user: dev
   password: strong
@@ -95,7 +95,8 @@ dav:
 ----
 
 - `bcg.calendar-category`: The value depends on the categories of the caldav server and its localization. +
-*as this value is used to delete and create birthdays, the value must be set correctly initially and must not be changed!*
+*This value is used to delete and create birthdays, the value must be set correctly initially and must not be changed!*
+- `dav.cron`: The cron trigger used to schedule the synchronization of birthdays.
 - `dav.user`, `dav.password`: Authentication credentials for the dav server.
 - `card-url`: The address book URL from which birthdays are read.
 - `cal-url`: The url of the birthday calendar which must be created. _To be on the safe side, it's a good idea to use an extra birthday calendar! But it is not mandatory since https://github.com/th-schwarz/BirthdayCalendarCreator/issues/2[A remote event should only be deleted if its categories contain the defined birthday category.]_
