@@ -32,7 +32,7 @@
         <project.build.sourceEncoding>${file.encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${file.encoding}</project.reporting.outputEncoding>
 
-        <ical4j.version>4.0.8</ical4j.version>
+        <ical4j.version>4.1.1</ical4j.version>
         <ical4j-vcard.version>2.0.1</ical4j-vcard.version>
         <sardine.version>5.13</sardine.version>
 
