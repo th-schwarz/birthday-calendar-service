@@ -20,6 +20,7 @@ import net.fortuna.ical4j.vcard.VCardBuilder;
 import net.fortuna.ical4j.vcard.property.BDay;
 import net.fortuna.ical4j.vcard.property.Fn;
 import net.fortuna.ical4j.vcard.property.N;
+
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +43,7 @@ public class CardHandler {
    * services.
    *
    * @param davConf The configuration object containing the credentials and URLs required for DAV
-   *     integration, such as user, password, and the address book URL.
+   *                integration, such as user, password, and the address book URL.
    */
   public CardHandler(DavConf davConf) {
     this.sardine = SardineFactory.begin(davConf.user(), davConf.password());
@@ -59,7 +60,9 @@ public class CardHandler {
         if (davResource.isDirectory()) {
           continue;
         }
-        log.info("Processing contact: {}", davResource.getDisplayName());
+        log.info("Processing contact: {}",
+            (davResource.getDisplayName() == null) ? "display name n/a" :
+                davResource.getDisplayName());
         URI href = new URI(davConf.getBaseUrl() + davResource.getHref().toString());
         try (InputStream vCardStream = sardine.get(href.toString())) {
           byte[] vcfContent = IOUtils.toByteArray(vCardStream);
@@ -78,15 +81,11 @@ public class CardHandler {
 
           String firstName = fullName.getGivenName();
           String lastName = fullName.getFamilyName();
-          contacts.add(
-              new Contact(
-                  firstName,
-                  lastName,
-                  displayName,
-                  LocalDate.parse(birthday.getValue(), birthdayFormatter)));
+          contacts.add(new Contact(firstName, lastName, displayName,
+              LocalDate.parse(birthday.getValue(), birthdayFormatter)));
         } catch (IllegalArgumentException e) {
-          log.warn(
-              "Error while processing contact {}: {}", davResource.getDisplayName(), e.getMessage());
+          log.warn("Error while processing contact {}: {}", davResource.getDisplayName(),
+              e.getMessage());
         }
       }
       return contacts;
