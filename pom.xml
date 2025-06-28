@@ -16,13 +16,13 @@
     <name>Birthday Calendar Generator</name>
 
     <issueManagement>
-        <url>https://github.com/th-schwarz/BirthdayCalendarCreator/issues</url>
+        <url>https://github.com/th-schwarz/BirthdayCalendarGenerator/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 
     <scm>
-        <developerConnection>scm:git:git@github.com:th-schwarz/BirthdayCalendarCreator</developerConnection>
-        <connection>scm:git:git@github.com:th-schwarz/BirthdayCalendarCreator</connection>
+        <developerConnection>scm:git:git@github.com:th-schwarz/BirthdayCalendarGenerator</developerConnection>
+        <connection>scm:git:git@github.com:th-schwarz/BirthdayCalendarGenerator</connection>
         <tag>HEAD</tag>
     </scm>
 
