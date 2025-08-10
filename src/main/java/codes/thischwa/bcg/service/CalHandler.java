@@ -185,7 +185,6 @@ public class CalHandler {
     Calendar calendar = new Calendar();
     calendar.add(new ProdId(conf.getProdId()));
     calendar.add(version);
-    calendar.add(new Method(Method.VALUE_PUBLISH));
     calendar.add(new CalScale(CalScale.VALUE_GREGORIAN)); //
 
     VEvent birthdayEvent = buildBirthdayEvent(contact);
