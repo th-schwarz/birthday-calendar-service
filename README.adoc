@@ -31,10 +31,13 @@ The author is looking for testers to test BCG on various groupware platforms. +
 Successfully tested so far:
 
 - sogo 5.12.0 (mailcow-dockerized 2025-05)
-- sogo 5.1.12 (mailcow-dockerized 2024-11b)
+- Docker: ckulka/baikal:apache-php8.2
 
 == Changelog
 
+* v2.0.2
+** issue #10 Docker support: any plan to release an image or accept PRs for a Dockerfile + CI?
+** issue #12 The 'method' property for a calendar object causes an exception in Baikal
 * v2.0.1
 ** issue #8 bcg terminates if the connection to the dav server fails
 ** issue #9 default of bcg.run-on-start should be false
