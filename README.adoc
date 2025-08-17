@@ -136,7 +136,7 @@ Images built from other branches are tagged with the branch name in lowercase, w
 ----
 ghcr.io/th-schwarz/bcg:feature-x
 ----
-Branch ´feature/x`is tagged as `feature-x`.
+Branch `feature/x` is tagged as `feature-x`.
 
 If you want the application to run once and exit, you can append:
 [source,bash]
