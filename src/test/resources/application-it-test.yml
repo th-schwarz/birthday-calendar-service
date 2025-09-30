@@ -1,0 +1,23 @@
+spring:
+  config:
+    import:
+
+bcg:
+  product: BirthdayCalendarGenerator
+  calendar-category: Birthday
+  cron: "0 30 4 * * SUN"
+  run-on-start: false
+
+event:
+  summary: "🎂 ~first-name~ ~last-name~"
+  description: "Birthday: ~birthday~"
+  date-format: yyyy-MM-dd
+  alarm: 1d
+
+dav:
+  user: ${SOGO_DAV_USER:dev}
+  password: ${SOGO_DAV_PASS:strong}
+  cal-url: ${SOGO_DAV_CAL_URL:https://dav.my-domain.org/SOGo/dav/dav-user/Calendar/dev/}
+  card-url: ${SOGO_DAV_CARD_URL:https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/dev/}
+  max-retries: 5
+  retry-delay-in-minutes: 1
