@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,12 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Month;
 import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Value;
@@ -40,7 +38,6 @@ import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.transform.recurrence.Frequency;
 
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -69,7 +66,7 @@ public class CalHandler {
    * @param sardineInitializer The initializer for {@link Sardine}.
    */
   CalHandler(BcgConf conf, EventConf eventConf, DavConf davConf,
-      SardineInitializer sardineInitializer) {
+             SardineInitializer sardineInitializer) {
     this.conf = conf;
     this.eventConf = eventConf;
     this.davConf = davConf;
@@ -84,29 +81,23 @@ public class CalHandler {
     Sardine sardine = sardineInitializer.getSardine();
     log.info("Syncing birthday events of {} contacts.", contacts.size());
 
+    Map<VEvent, URL> allBirthdayEvents = CalUtil.collectBirthdayEvents(sardine, davConf.calUrl());
     Map<String, VEvent> existingEvents = new HashMap<>();
     Map<String, Contact> existingContacts = new HashMap<>();
-    List<DavResource> davResources = sardine.list(davConf.calUrl());
-    Map<String, URI> existingEventUris = new HashMap<>();
+    Map<String, URL> existingEventUris = new HashMap<>();
 
-    // collecting all events matching the desired category
-    for (DavResource resource : davResources) {
-      if (CALENDAR_CONTENT_TYPE.equalsIgnoreCase(resource.getContentType())) {
-        VEvent event = convert(resource, sardine);
-        if (event != null && matchCategory(event)) {
-          String uuid = CalUtil.extractContactsUUIDFromEvent(event);
-          existingEvents.put(uuid, event);
-          String eventId = CalUtil.extractEventId(resource.getHref());
-          existingEventUris.put(eventId, resource.getHref());
-        }
-      }
+    for (VEvent event : allBirthdayEvents.keySet()) {
+      String uuid = CalUtil.extractContactsUUIDFromEvent(event);
+      existingEvents.put(uuid, event);
+      String eventId = CalUtil.extractEventId(allBirthdayEvents.get(event));
+      existingEventUris.put(eventId, allBirthdayEvents.get(event));
     }
 
     // delete birthday events from contacts whose doesn't exist
     contacts.forEach(person -> existingContacts.put(CalUtil.createContactIdentifier(person), person));
     existingEvents.keySet().forEach((eventUuid) -> {
       if (!existingContacts.containsKey(eventUuid)) {
-        URI eventUri = existingEventUris.get(eventUuid);
+        URL eventUri = existingEventUris.get(eventUuid);
         try {
           sardine.delete(davConf.getBaseUrl() + eventUri.getPath());
           log.debug("Deleted outdated event: {}", eventUri.getPath());
@@ -137,42 +128,13 @@ public class CalHandler {
       Calendar personCal = buildBirthdayCalendar(contact);
       String uuid = CalUtil.createContactIdentifier(contact);
       if (existingEventUris.containsKey(uuid)) {
-        URI eventUri = existingEventUris.get(uuid);
+        URL eventUri = existingEventUris.get(uuid);
         sardine.delete(davConf.getBaseUrl() + eventUri.getPath());
         log.debug("Deleted outdated event before add: {}", eventUri.getPath());
       }
       uploadSingleEvent(sardine, personCal, contact);
       log.info("Added or updated event for: {}", contact.getFullName());
     }
-  }
-
-  private boolean matchCategory(VEvent event) {
-    return event.getCategories().stream().anyMatch(
-        categories -> categories.getCategories().getTexts().contains(conf.calendarCategory()));
-  }
-
-  private @Nullable VEvent convert(DavResource resource, Sardine sardine) throws IllegalArgumentException {
-    String url = davConf.getBaseUrl() + resource.getHref().getPath();
-    try (InputStream inputStream = sardine.get(url)) {
-      if (inputStream != null) {
-        // Parse the iCalendar content
-        CalendarBuilder builder = new CalendarBuilder();
-        Calendar calendar = builder.build(inputStream);
-        if (calendar.getComponents().size() != 1) {
-          throw new IllegalArgumentException(
-              "Unexpected number of calendar components: " + calendar.getComponents().size() +
-                  " for URL: " + url + " (expected: 1)");
-        }
-
-        CalendarComponent component = calendar.getComponents().get(0);
-        if (component instanceof VEvent) {
-          return (VEvent) component;
-        }
-      }
-    } catch (ParserException | IOException e) {
-      throw new IllegalArgumentException(e);
-    }
-    return null;
   }
 
   private Calendar buildBirthdayCalendar(Contact contact) {

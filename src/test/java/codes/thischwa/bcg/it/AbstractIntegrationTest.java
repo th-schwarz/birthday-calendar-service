@@ -226,7 +226,7 @@ public abstract class AbstractIntegrationTest {
         cal.getComponents().forEach(c -> {
           if (c instanceof VEvent ev) {
             boolean isBirthdayCategory = ev.getProperty(Categories.CATEGORIES)
-                .map(p -> p.getValue()).map(bcgConf.calendarCategory()::equals).orElse(false);
+                .map(Content::getValue).map(bcgConf.calendarCategory()::equals).orElse(false);
             if (isBirthdayCategory) {
               events.add(ev);
             }
