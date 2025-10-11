@@ -1,4 +1,4 @@
-package codes.thischwa.bcg.it;
+package codes.thischwa.bcg.backend;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -11,7 +11,7 @@ import org.springframework.test.context.DynamicPropertySource;
 
 @Slf4j
 @Disabled("Only for local testing")
-class BaikalLocalTest extends AbstractIntegrationTest {
+class BaikalLocalTest extends AbstractBackendTest {
 
   private static final String DAV_USER = System.getenv("BAIKAL_DAV_USER");
   private static final String DAV_PASS = System.getenv("BAIKAL_DAV_PASS");

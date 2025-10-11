@@ -1,4 +1,4 @@
-package codes.thischwa.bcg.it;
+package codes.thischwa.bcg.backend;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
 @Slf4j
-public class BaikalDockerTest extends AbstractIntegrationTest {
+public class BaikalDockerTest extends AbstractBackendTest {
 
   // Baikal runs on port 80 in the container
   @Container

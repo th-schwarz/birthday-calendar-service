@@ -2,7 +2,6 @@ package codes.thischwa.bcg;
 
 import codes.thischwa.bcg.service.BirthdayScheduler;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,7 +9,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
-
 
 /**
  * The main application class for the Birthday Calendar Generator (BCG) application.
@@ -25,6 +23,7 @@ import org.springframework.context.annotation.Profile;
 @ConfigurationPropertiesScan
 @SpringBootApplication
 @Slf4j
+@Profile({"!test", "!backend-test"})
 public class BcgApp {
 
   /**
@@ -49,7 +48,6 @@ public class BcgApp {
    * Adds a command-line option to stop the application after calendar synchronization.
    */
   @Bean
-  @Profile({"!test", "!it-test"})
   public ApplicationRunner applicationRunner(BirthdayScheduler birthdayScheduler) {
     return args -> {
       if (args.containsOption("run-once")) {

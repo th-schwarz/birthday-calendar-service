@@ -157,11 +157,12 @@
             </plugin>
 
             <plugin>
+                <!-- testing without backend tests -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/codes/thischwa/bcg/it/**</exclude>
+                        <exclude>**/codes/thischwa/bcg/backend/**</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <spring.profiles.active>test</spring.profiles.active>
@@ -196,26 +197,17 @@
 
     <profiles>
         <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-
-        <profile>
-            <id>it-test</id>
+            <id>release</id>
+            <properties>
+                <skipITs>true</skipITs>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
-                            <systemPropertyVariables>
-                                <spring.profiles.active>it-test</spring.profiles.active>
-                            </systemPropertyVariables>
-                            <includes>
-                                <include>**/it/*.java</include>
-                            </includes>
+                            <skipITs>true</skipITs>
                         </configuration>
                     </plugin>
                 </plugins>

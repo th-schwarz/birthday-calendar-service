@@ -1,7 +1,12 @@
-package codes.thischwa.bcg.it;
+package codes.thischwa.bcg.backend;
+
+import static codes.thischwa.bcg.service.CalHandler.CALENDAR_CONTENT_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import codes.thischwa.bcg.Contact;
-import codes.thischwa.bcg.TestTypeProfileResolver;
 import codes.thischwa.bcg.conf.BcgConf;
 import codes.thischwa.bcg.conf.DavConf;
 import codes.thischwa.bcg.service.BirthdayCalGenerator;
@@ -24,18 +29,14 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.model.component.VEvent;
-
-import static codes.thischwa.bcg.service.CalHandler.CALENDAR_CONTENT_TYPE;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles(resolver = TestTypeProfileResolver.class)
+@ActiveProfiles("backend-test")
 @Slf4j
-public abstract class AbstractIntegrationTest {
+public abstract class AbstractBackendTest {
 
   @Autowired
   protected BirthdayCalGenerator generator;

@@ -1,4 +1,4 @@
-package codes.thischwa.bcg.it;
+package codes.thischwa.bcg.backend;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,7 +10,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 @Slf4j
-class SogoTest extends AbstractIntegrationTest {
+class SogoTest extends AbstractBackendTest {
 
   private static final String DAV_USER = System.getenv("SOGO_DAV_USER");
   private static final String DAV_PASS = System.getenv("SOGO_DAV_PASS");
