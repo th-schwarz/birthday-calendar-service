@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @EnableScheduling
-@Profile({"!test", "!it-test"})
+@Profile({"!test", "!backend-test"})
 @Slf4j
 public class BirthdayScheduler {
 

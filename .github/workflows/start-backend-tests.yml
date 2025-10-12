@@ -1,10 +1,10 @@
-name: Integration Tests with it-test Profile
+name: Backend Tests with backend-test Profile
 
 on:
   workflow_dispatch:
 
 jobs:
-  integration-test:
+  backend-test:
     runs-on: ubuntu-latest
     
     steps:
@@ -24,7 +24,7 @@ jobs:
         restore-keys: maven
         
     - name: Run Integration Tests
-      run: mvn clean test -P it-test
+      run: mvn clean test -P backend-test
       env:
         SOGO_DAV_USER: ${{ secrets.SOGO_DAV_USER }}
         SOGO_DAV_PASS: ${{ secrets.SOGO_DAV_PASS }}
