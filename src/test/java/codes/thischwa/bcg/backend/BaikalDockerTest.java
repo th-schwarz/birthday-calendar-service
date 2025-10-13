@@ -27,14 +27,18 @@ public class BaikalDockerTest extends AbstractBackendTest {
 
   private static Network network = Network.newNetwork();
 
-  // Baikal runs on port 80 in the container
   @Container
-  public static GenericContainer<?> baikal = new GenericContainer<>("thschwarz/baikal:latest")
+  private static GenericContainer<?> baikal = new GenericContainer<>("thschwarz/baikal:latest")
       .withExposedPorts(80)
       .withNetwork(network)
+      .withCreateContainerCmdModifier(cmd ->
+          cmd.getHostConfig().withShmSize(128 * 1024 * 1024L)
+      )
       .waitingFor(
-          Wait.forListeningPort()
-              .withStartupTimeout(Duration.ofSeconds(90)));
+          Wait.forHttp("/dav.php/").forStatusCode(200)
+              .withStartupTimeout(Duration.ofSeconds(120))
+      );
+
 
   @BeforeAll
   public static void testBaikalIsRunning() throws IOException {

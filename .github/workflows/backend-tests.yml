@@ -48,7 +48,7 @@ jobs:
         run: mvn clean verify -B
         env:
           TESTCONTAINERS_RYUK_DISABLED: true
-          TESTCONTAINERS_CHECKS_DISABLE: true
+          TESTCONTAINERS_LOG_LEVEL: DEBUG
           SOGO_DAV_USER: ${{ secrets.SOGO_DAV_USER }}
           SOGO_DAV_PASS: ${{ secrets.SOGO_DAV_PASS }}
           SOGO_DAV_CARD_URL: ${{ secrets.SOGO_DAV_CARD_URL }}
