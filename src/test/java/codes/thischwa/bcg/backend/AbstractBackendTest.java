@@ -108,6 +108,10 @@ public abstract class AbstractBackendTest {
     assumeTrue(janeEventStillExists, "Jane Doe's birthday event should still exist");
 
     log.info("*** All steps completed successfully for: {}", this.getClass().getSimpleName());
+
+    clearRemoteCalendar();
+    clearRemoteCard();
+    log.info("Step 7: Remote cleanup completed");
   }
 
   private boolean dateEquals(VEvent bdEvent, LocalDate dtStart) {
