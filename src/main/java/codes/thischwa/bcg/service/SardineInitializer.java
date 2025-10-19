@@ -2,12 +2,19 @@ package codes.thischwa.bcg.service;
 
 import codes.thischwa.bcg.conf.DavConf;
 import com.github.sardine.Sardine;
-import com.github.sardine.SardineFactory;
+import com.github.sardine.impl.SardineImpl;
 import java.io.IOException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.fortuna.ical4j.util.CompatibilityHints;
 
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolException;
+import org.apache.http.client.CircularRedirectException;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.HttpContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -23,10 +30,7 @@ public class SardineInitializer {
 
   public SardineInitializer(DavConf davConf) {
     this.davConf = davConf;
-    this.sardine = SardineFactory.begin(davConf.user(), davConf.password());
-    this.sardine.enablePreemptiveAuthentication(davConf.getBaseUrl());
-    CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_UNFOLDING, true);
-    CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
+    this.sardine = CustomFactory.begin(davConf.user(), davConf.password());
   }
 
   public boolean canAccessBaseUrl() {
@@ -47,5 +51,32 @@ public class SardineInitializer {
       }
     }
     return false;
+  }
+
+  private static class CustomFactory {
+    static Sardine begin(String username, String password) {
+      HttpClientBuilder builder = HttpClientBuilder.create();
+
+      // Set a custom redirect strategy with limited redirects
+      builder.setRedirectStrategy(new LimitedRedirectStrategy());
+
+      return new SardineImpl(builder, username, password);
+    }
+
+    private static class LimitedRedirectStrategy extends DefaultRedirectStrategy {
+      private static final int MAX_REDIRECTS = 3;
+      private final ThreadLocal<Integer> redirectCount = ThreadLocal.withInitial(() -> 0);
+
+      @Override
+      public HttpUriRequest getRedirect(HttpRequest request, HttpResponse response, HttpContext context) throws ProtocolException {
+        int count = redirectCount.get();
+        if (count >= MAX_REDIRECTS) {
+          redirectCount.set(0);
+          throw new CircularRedirectException("Maximum redirects (" + MAX_REDIRECTS + ") exceeded");
+        }
+        redirectCount.set(count + 1);
+        return super.getRedirect(request, response, context);
+      }
+    }
   }
 }
