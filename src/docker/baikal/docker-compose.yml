@@ -1,0 +1,7 @@
+# just for local testing
+
+services:
+  baikal-it:
+    image: thschwarz/baikal-it:1.0
+    ports:
+      - 127.0.0.1:8080:80
