@@ -1,4 +1,4 @@
-name: Start all Backend Tests
+name: Run all Backend Tests
 
 on:
   workflow_dispatch:

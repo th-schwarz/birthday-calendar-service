@@ -1,4 +1,4 @@
-name: Start Backend SOGo Tests
+name: Run Backend SOGo Tests
 
 on:
   workflow_dispatch:

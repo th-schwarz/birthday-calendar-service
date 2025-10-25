@@ -27,13 +27,14 @@ If you find a bug or certain features are missing, don’t hesitate to file an i
 
 I’m not responsible for any data loss, hardware damage or broken keyboards. This guide comes without any warranty!
 
-== Testers wanted!
+== Backend Tests
 
-The author is looking for testers to test BCG on various groupware platforms. +
-Successfully tested so far:
+All backend tests: image:https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-tests.yml/badge.svg["GitHub CI All Backend Tests",link="https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-tests.yml"]
 
-- sogo 5.12.0 (mailcow-dockerized 2025-05)
-- Docker: ckulka/baikal:apache-php8.2
+Single backend tests:
+
+* image:https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-baikal.yml/badge.svg["GitHub CI Baikal Backend Tests",link="https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-tests.yml"]
+* image:https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-sogo.yml/badge.svg["GitHub CI Sogo Backend Tests",link="https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-sogo.yml"]
 
 == Changelog
 
