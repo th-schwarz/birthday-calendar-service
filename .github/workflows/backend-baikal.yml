@@ -1,12 +1,10 @@
-name: Run all Backend Tests
+name: Run Backend Baikal Tests
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 5 * * 6' # Run every Saturday at 5:00 UTC
 
 jobs:
-  backend-tests:
+  baikal-tests:
     runs-on: ubuntu-latest
 
     permissions:
@@ -21,7 +19,7 @@ jobs:
       - name: Verify Docker works
         run: docker version
 
-      - name: Pull required Docker images
+      - name: Pull Baikal Docker image
         run: docker pull thschwarz/baikal-it:1.0
 
       - name: Set up JDK 17
@@ -38,12 +36,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Run Backend Tests (with Testcontainers)
-        run: mvn clean verify -B
+      - name: Run Baikal Docker Tests
+        run: mvn clean test -B -Dtest=BaikalDockerTest
         env:
           TESTCONTAINERS_RYUK_DISABLED: true
           TESTCONTAINERS_LOG_LEVEL: DEBUG
-          SOGO_DAV_USER: ${{ secrets.SOGO_DAV_USER }}
-          SOGO_DAV_PASS: ${{ secrets.SOGO_DAV_PASS }}
-          SOGO_DAV_CARD_URL: ${{ secrets.SOGO_DAV_CARD_URL }}
-          SOGO_DAV_CAL_URL: ${{ secrets.SOGO_DAV_CAL_URL }}

@@ -52,10 +52,10 @@ public abstract class AbstractBackendTest {
   protected SardineInitializer sardineInitializer;
 
   private final Contact janeWithBirthDay = new Contact("Jane", "Doe", "J. Doe",
-      LocalDate.of(1990, 5, 12), "c1-jane");
+      LocalDate.of(1990, 5, 12), "jane0000-0000-0000-0000-000000000000.vcf");
   private final Contact johnWithBirthday = new Contact("John", "Smith", "J. Smith",
-      LocalDate.of(1985, 11, 3), "c2-john");
-  private final Contact richard = new Contact("Richard", "Smith", "R. Smith", null, "c3-richard");
+      LocalDate.of(1985, 11, 3), "john0000-0000-0000-0000-000000000000.vcf");
+  private final Contact richard = new Contact("Richard", "Smith", "R. Smith", null, "rich0000-0000-0000-0000-000000000000.vcf");
 
   void syncAndVerify() throws Exception {
     Sardine sardine = sardineInitializer.getSardine();
@@ -73,16 +73,16 @@ public abstract class AbstractBackendTest {
         .orElseThrow(() -> new AssertionError("Jane Doe's birthday event not found"));
     assertTrue(dateEquals(bdEvent, janeWithBirthDay.birthday()), "Jane Doe's birthday event should reflect the birthday");
     bdEvent = eventsAfterFirstSync.stream()
-      .filter(e -> e.getSummary().getValue().contains("John"))
-      .findFirst()
-      .orElseThrow(() -> new AssertionError("John Smith's birthday event not found"));
+        .filter(e -> e.getSummary().getValue().contains("John"))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("John Smith's birthday event not found"));
     assertTrue(dateEquals(bdEvent, johnWithBirthday.birthday()), "John Smith's birthday event should reflect the birthday");
 
     // 5) Change the birthday of one contact and verify
     log.info("Step 5: Changing Jane Doe's birthday and re-synchronizing");
     LocalDate janeNewBday = janeWithBirthDay.birthday().plusDays(1);
     Contact janeUpdated = new Contact(janeWithBirthDay.firstName(), janeWithBirthDay.lastName(),
-        janeWithBirthDay.displayName(), janeNewBday);
+        janeWithBirthDay.displayName(), janeNewBday, janeWithBirthDay.identifier());
     putVCard(davConf.cardUrl() + janeWithBirthDay.identifier(), buildVCard(janeUpdated));
     generator.processBirthdayEvents();
     List<VEvent> eventsAfterChange = listBirthdayEvents(sardine);
@@ -101,10 +101,10 @@ public abstract class AbstractBackendTest {
     List<VEvent> eventsAfterDeletion = listBirthdayEvents(sardine);
     assertEquals(1, eventsAfterDeletion.size(), "Expected exactly 1 birthday event");
     boolean johnEventStillExists =
-      eventsAfterDeletion.stream().anyMatch(e -> e.getSummary().getValue().contains("John"));
+        eventsAfterDeletion.stream().anyMatch(e -> e.getSummary().getValue().contains("John"));
     assertFalse(johnEventStillExists, "John Smith's birthday event should be deleted after contact removal");
     boolean janeEventStillExists =
-      eventsAfterDeletion.stream().anyMatch(e -> e.getSummary().getValue().contains("Jane"));
+        eventsAfterDeletion.stream().anyMatch(e -> e.getSummary().getValue().contains("Jane"));
     assumeTrue(janeEventStillExists, "Jane Doe's birthday event should still exist");
 
     log.info("*** All steps completed successfully for: {}", this.getClass().getSimpleName());
@@ -134,25 +134,25 @@ public abstract class AbstractBackendTest {
   private String buildVCard(Contact contact) {
     List<String> lines = new ArrayList<>();
     lines.add("BEGIN:VCARD");
-    lines.add("VERSION:3.0");
+    lines.add("VERSION:4.0");
+    String uid = contact.identifier().replace(".vcf", "");
+    lines.add("UID:" + uid);
     lines.add("N:" + contact.lastName() + ";" + contact.firstName() + ";;;");
     lines.add("FN:" + contact.displayName());
     LocalDate bday = contact.birthday();
     if (bday != null) {
       String val = String.format("%04d%02d%02d", bday.getYear(), bday.getMonthValue(), bday.getDayOfMonth());
       lines.add("BDAY:" + val);
-      lines.add("UID:" + contact.identifier());
     }
     lines.add("END:VCARD");
-    return String.join("\n", lines);
+    return String.join("\r\n", lines);
   }
 
-  private  void putVCard(String url, String content) throws IOException {
+  void putVCard(String url, String content) throws IOException {
+    log.info("Uploading vCard via Sardine: {}", url);
     Sardine sardine = sardineInitializer.getSardine();
-    log.info("Uploading vCard: {}", url);
-    try (InputStream is = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
-      sardine.put(url, is);
-    }
+    byte[] data = content.getBytes(StandardCharsets.UTF_8);
+    sardine.put(url, data, "text/vcard; charset=utf-8");
   }
 
   /**
