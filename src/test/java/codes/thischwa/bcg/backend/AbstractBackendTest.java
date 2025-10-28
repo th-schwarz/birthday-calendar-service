@@ -144,7 +144,7 @@ public abstract class AbstractBackendTest {
       lines.add("UID:" + contact.identifier());
     }
     lines.add("END:VCARD");
-    return String.join("\n", lines);
+    return String.join("\r\n", lines);
   }
 
   void putVCard(String url, String content) throws IOException {
