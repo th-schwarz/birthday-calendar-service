@@ -5,3 +5,7 @@ services:
     image: thschwarz/baikal-it:1.0
     ports:
       - 127.0.0.1:8080:80
+    environment:
+      - .config:/var/www/baikal/config
+      - .Specific:/var/www/baikal/Specific
+      - .db:/var/www/baikal/db
