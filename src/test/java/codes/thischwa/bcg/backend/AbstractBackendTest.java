@@ -149,11 +149,10 @@ public abstract class AbstractBackendTest {
   }
 
   void putVCard(String url, String content) throws IOException {
+    log.info("Uploading vCard via Sardine: {}", url);
     Sardine sardine = sardineInitializer.getSardine();
-    log.info("Uploading vCard: {}", url);
-    try (InputStream is = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
-      sardine.put(url, is);
-    }
+    byte[] data = content.getBytes(StandardCharsets.UTF_8);
+    sardine.put(url, data, "text/vcard; charset=utf-8");
   }
 
   /**
