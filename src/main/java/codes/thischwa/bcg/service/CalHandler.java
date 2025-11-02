@@ -20,6 +20,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Month;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -28,6 +29,8 @@ import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Categories;
 import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.DtStamp;
+import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Status;
@@ -114,7 +117,7 @@ public class CalHandler {
 
       if (existingEvent == null || !CalUtil.isBirthdayEquals(existingEvent, contact)) {
         changedPeople.add(contact);
-        log.debug("New or updated event for: {}", contact.getFullName());
+        log.debug("New or updated event found for: {}", contact.getFullName());
       }
     }
     if (changedPeople.isEmpty()) {
@@ -166,13 +169,21 @@ public class CalHandler {
   private VEvent buildBirthdayEvent(Contact contact) {
     Summary summary = buildSummary(contact);
     String description = eventConf.generateDescription(contact);
-    VEvent birthdayEvent = new VEvent(contact.birthday(), summary.getValue());
+
+    // Create the birthday event as an all-day event
+    LocalDate birthday = contact.birthday();
+    VEvent birthdayEvent = new VEvent(birthday, birthday.plusDays(1), summary.getValue());
+
     birthdayEvent.add(new Uid(contact.identifier()));
+
+    // Add DTSTAMP - required by most CalDAV servers
+    birthdayEvent.add(new DtStamp());
+
 
     // build and add the repetition rule
     Recur<LocalDate> recur = new Recur.Builder<LocalDate>().frequency(Frequency.YEARLY).build();
-    recur.getMonthList().add(Month.valueOf(contact.birthday().getMonthValue()));
-    recur.getMonthDayList().add(contact.birthday().getDayOfMonth());
+    recur.getMonthList().add(Month.valueOf(birthday.getMonthValue()));
+    recur.getMonthDayList().add(birthday.getDayOfMonth());
     birthdayEvent.add(new RRule<>(recur));
 
     if (eventConf.getAlarmDuration() != null) {
@@ -199,11 +210,14 @@ public class CalHandler {
 
   private void uploadSingleEvent(Sardine sardine, Calendar calendar, Contact contact) throws IOException {
     String eventContent = calendar.toString();
-    String eventUrl = davConf.calUrl() + contact.identifier();
+    String eventUrl = davConf.calUrl() + contact.identifier() + ".ics";
     try (InputStream inputStream = new ByteArrayInputStream(
         eventContent.getBytes(StandardCharsets.UTF_8))) {
-      sardine.put(eventUrl, inputStream);
+      sardine.put(eventUrl, inputStream, CALENDAR_CONTENT_TYPE);
       log.debug("Uploaded birthday event for '{}': {}", contact.getFullName(), eventUrl);
+    } catch (IOException e) {
+      log.error("Failed to upload birthday event for '{}': {}", contact.getFullName(), eventUrl, e);
+      throw e;
     }
   }
 }

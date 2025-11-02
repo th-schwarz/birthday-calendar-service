@@ -52,10 +52,10 @@ public abstract class AbstractBackendTest {
   protected SardineInitializer sardineInitializer;
 
   private final Contact janeWithBirthDay = new Contact("Jane", "Doe", "J. Doe",
-      LocalDate.of(1990, 5, 12), "jane0000-0000-0000-0000-000000000000.vcf");
+      LocalDate.of(1990, 5, 12), "jane0000-0000-0000-0000-000000000000");
   private final Contact johnWithBirthday = new Contact("John", "Smith", "J. Smith",
-      LocalDate.of(1985, 11, 3), "john0000-0000-0000-0000-000000000000.vcf");
-  private final Contact richard = new Contact("Richard", "Smith", "R. Smith", null, "rich0000-0000-0000-0000-000000000000.vcf");
+      LocalDate.of(1985, 11, 3), "john0000-0000-0000-0000-000000000000");
+  private final Contact richard = new Contact("Richard", "Smith", "R. Smith", null, "rich0000-0000-0000-0000-000000000000");
 
   void syncAndVerify() throws Exception {
     Sardine sardine = sardineInitializer.getSardine();
@@ -95,7 +95,7 @@ public abstract class AbstractBackendTest {
 
     // 6) Delete a contact with a birthday and verify event removal
     log.info("Step 6: Deleting John Smith contact and re-synchronizing");
-    sardine.delete(davConf.cardUrl() + johnWithBirthday.identifier());
+    sardine.delete(davConf.cardUrl() + johnWithBirthday.identifier() + ".vcf");
     generator.processBirthdayEvents();
 
     List<VEvent> eventsAfterDeletion = listBirthdayEvents(sardine);
@@ -149,6 +149,9 @@ public abstract class AbstractBackendTest {
   }
 
   void putVCard(String url, String content) throws IOException {
+    if (!url.endsWith(".vcf")) {
+      url += ".vcf";
+    }
     log.info("Uploading vCard via Sardine: {}", url);
     Sardine sardine = sardineInitializer.getSardine();
     byte[] data = content.getBytes(StandardCharsets.UTF_8);

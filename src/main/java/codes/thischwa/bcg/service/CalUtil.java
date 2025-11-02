@@ -42,7 +42,10 @@ public class CalUtil {
   public static String extractContactsUUIDFromEvent(VEvent event) {
     try {
       Property p = event.getProperty(Uid.UID).orElseThrow();
-      return p.getValue();
+      String uuid = p.getValue();
+      if (uuid.endsWith(".vcf"))
+        uuid = uuid.substring(0, uuid.lastIndexOf('.'));
+      return uuid;
     } catch (NoSuchElementException e) {
       throw new IllegalArgumentException(e);
     }
@@ -50,8 +53,6 @@ public class CalUtil {
 
   /**
    * Extracts the event ID from a given event URI.
-   * This method assumes the event URI contains a file name with a ".ics" extension
-   * and removes the extension to retrieve the event ID.
    *
    * @param inputUrl the URL of the event from which the event ID is to be extracted
    * @return the extracted event ID as a string
@@ -60,7 +61,9 @@ public class CalUtil {
   public static String extractEventId(URL inputUrl) {
     String path = inputUrl.getPath();
     String fileName = path.substring(path.lastIndexOf('/') + 1);
-    return fileName.replace(".ics", "");
+    if (fileName.contains("."))
+      fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+    return fileName;
   }
 
   /**
