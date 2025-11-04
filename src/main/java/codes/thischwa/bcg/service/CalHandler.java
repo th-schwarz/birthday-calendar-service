@@ -4,12 +4,10 @@ import codes.thischwa.bcg.Contact;
 import codes.thischwa.bcg.conf.BcgConf;
 import codes.thischwa.bcg.conf.DavConf;
 import codes.thischwa.bcg.conf.EventConf;
-import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -19,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Month;
-import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -29,8 +25,6 @@ import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Categories;
 import net.fortuna.ical4j.model.property.Description;
-import net.fortuna.ical4j.model.property.DtStamp;
-import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Status;
@@ -40,7 +34,6 @@ import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.transform.recurrence.Frequency;
-
 import org.springframework.stereotype.Service;
 
 /**
@@ -117,7 +110,7 @@ public class CalHandler {
 
       if (existingEvent == null || !CalUtil.isBirthdayEquals(existingEvent, contact)) {
         changedPeople.add(contact);
-        log.debug("New or updated event found for: {}", contact.getFullName());
+        log.debug("Found new or updated event found for: {}", contact.getFullName());
       }
     }
     if (changedPeople.isEmpty()) {
@@ -167,6 +160,7 @@ public class CalHandler {
    * @return the constructed VEvent representing the person's birthday
    */
   private VEvent buildBirthdayEvent(Contact contact) {
+    assert contact.birthday() != null;
     Summary summary = buildSummary(contact);
     String description = eventConf.generateDescription(contact);
 
@@ -174,23 +168,17 @@ public class CalHandler {
     LocalDate birthday = contact.birthday();
     VEvent birthdayEvent = new VEvent(birthday, birthday.plusDays(1), summary.getValue());
 
+    // add the UID
     birthdayEvent.add(new Uid(contact.identifier()));
 
-    // Add DTSTAMP - required by most CalDAV servers
-    birthdayEvent.add(new DtStamp());
-
-
-    // build and add the repetition rule
-    Recur<LocalDate> recur = new Recur.Builder<LocalDate>().frequency(Frequency.YEARLY).build();
-    recur.getMonthList().add(Month.valueOf(birthday.getMonthValue()));
-    recur.getMonthDayList().add(birthday.getDayOfMonth());
-    birthdayEvent.add(new RRule<>(recur));
+    // add the repetition rule
+    birthdayEvent.add(new RRule<>(new Recur.Builder<LocalDate>().frequency(Frequency.YEARLY).build()));
 
     if (eventConf.getAlarmDuration() != null) {
       // build and add an alarm
       VAlarm alarm = new VAlarm();
 
-      // create trigger with VALUE=DURATION explicitly
+      // create a trigger with VALUE=DURATION explicitly
       Trigger trigger = new Trigger(eventConf.getAlarmDuration());
       trigger.add(Value.DURATION);
       alarm.add(trigger);
@@ -214,9 +202,9 @@ public class CalHandler {
     try (InputStream inputStream = new ByteArrayInputStream(
         eventContent.getBytes(StandardCharsets.UTF_8))) {
       sardine.put(eventUrl, inputStream, CALENDAR_CONTENT_TYPE);
-      log.debug("Uploaded birthday event for '{}': {}", contact.getFullName(), eventUrl);
+      log.debug("Uploaded birthday event for '{}': {}\n{}", contact.getFullName(), eventUrl, eventContent);
     } catch (IOException e) {
-      log.error("Failed to upload birthday event for '{}': {}", contact.getFullName(), eventUrl, e);
+      log.error("Failed to upload birthday event for '{}': {}\n{}", contact.getFullName(), eventUrl, eventContent, e);
       throw e;
     }
   }
