@@ -201,7 +201,7 @@ public class CalHandler {
     String eventUrl = davConf.calUrl() + contact.identifier() + ".ics";
     try (InputStream inputStream = new ByteArrayInputStream(
         eventContent.getBytes(StandardCharsets.UTF_8))) {
-      sardine.put(eventUrl, inputStream, CALENDAR_CONTENT_TYPE);
+      sardine.put(eventUrl, inputStream, CALENDAR_CONTENT_TYPE + "; CHARSET=UTF-8");
       log.debug("Uploaded birthday event for '{}': {}\n{}", contact.getFullName(), eventUrl, eventContent);
     } catch (IOException e) {
       log.error("Failed to upload birthday event for '{}': {}\n{}", contact.getFullName(), eventUrl, eventContent, e);
