@@ -2,9 +2,6 @@ name: Run Backend SOGo Tests
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 5 * * 1' # Run every Monday at 5:00 UTC
-
 jobs:
   sogo-tests:
     runs-on: ubuntu-latest
