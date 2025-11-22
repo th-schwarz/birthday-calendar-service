@@ -37,6 +37,7 @@ import org.springframework.test.context.ActiveProfiles;
 @Slf4j
 public abstract class AbstractBackendTest {
 
+  static final int STARTUP_TIMEOUT_SEC = 180;
   @Autowired
   protected BirthdayCalGenerator generator;
 

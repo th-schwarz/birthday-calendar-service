@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,18 +26,21 @@ public class BaikalComposeTest extends AbstractBackendTest {
   private static final String COMPOSE_DIR = System.getProperty("user.dir") + "/src/docker/baikal";
   private static String BASE_URL;
 
+  private static final int SERVICE_PORT = 80;
+  private static final String SERVICE_NAME = "baikal-it";
+
   @Container
   public static ComposeContainer baikal = new ComposeContainer(
       new File(COMPOSE_DIR + "/docker-compose.yml"))
       .withLocalCompose(true)
-      .withExposedService("baikal-it", 80, Wait.forHttp("/")
-          .forStatusCode(200)
-          .withStartupTimeout(Duration.ofSeconds(120)));
+      .withExposedService(SERVICE_NAME, SERVICE_PORT, Wait.forHttp("/")
+          .forStatusCode(HttpStatus.SC_OK)
+          .withStartupTimeout(Duration.ofSeconds(STARTUP_TIMEOUT_SEC)));
 
   @BeforeAll
   public static void testIsRunning() throws IOException {
-    String host = baikal.getServiceHost("baikal-it", 80);
-    Integer port = baikal.getServicePort("baikal-it", 80);
+    String host = baikal.getServiceHost(SERVICE_NAME, SERVICE_PORT);
+    Integer port = baikal.getServicePort(SERVICE_NAME, SERVICE_PORT);
     BASE_URL = "http://" + host + ":" + port + "/";
     log.info("Base URL: {}", BASE_URL);
 
@@ -45,7 +49,7 @@ public class BaikalComposeTest extends AbstractBackendTest {
     connection.setRequestMethod("GET");
     int responseCode = connection.getResponseCode();
 
-    assertEquals(200, responseCode, "Baikal should return HTTP 200");
+    assertEquals(HttpStatus.SC_OK, responseCode, "Baikal should return HTTP 200");
   }
 
   @DynamicPropertySource

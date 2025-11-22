@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,25 +25,27 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class RadicaleComposeTest extends AbstractBackendTest {
 
   private static String BASE_URL;
+  private static final int SERVICE_PORT = 5232;
+  private static final String SERVICE_NAME = "radicale-it";
 
   @Container
   public static ComposeContainer radicale = new ComposeContainer(
       new File("src/docker/radicale/docker-compose.yml"))
       .withLocalCompose(true)
       .withPull(true)
-      .withLogConsumer("radicale-it", new Slf4jLogConsumer(log).withPrefix("radicale-it"))
+      //.withLogConsumer(SERVICE_NAME, new Slf4jLogConsumer(log).withPrefix(SERVICE_NAME))
       .withExposedService(
-          "radicale-it",
-          5232,
+          SERVICE_NAME,
+          SERVICE_PORT,
           Wait.forHttp("/")
-              .forStatusCodeMatching(status -> status >= 200 && status < 500)
-              .withStartupTimeout(Duration.ofSeconds(180))
+              .forStatusCodeMatching(status -> status >= HttpStatus.SC_OK && status < 500)
+              .withStartupTimeout(Duration.ofSeconds(STARTUP_TIMEOUT_SEC))
       );
 
   @BeforeAll
   public static void testIsRunning() throws IOException {
-    String host = radicale.getServiceHost("radicale-it", 5232);
-    Integer port = radicale.getServicePort("radicale-it", 5232);
+    String host = radicale.getServiceHost(SERVICE_NAME, SERVICE_PORT);
+    Integer port = radicale.getServicePort(SERVICE_NAME, SERVICE_PORT);
     BASE_URL = "http://" + host + ":" + port + "/";
     log.info("Base URL: {}", BASE_URL);
 
