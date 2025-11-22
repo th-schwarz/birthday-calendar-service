@@ -6,6 +6,9 @@ services:
       - "5232"
     environment:
       - LOG_LEVEL=debug
+      - RADICALE_CONFIG=/etc/radicale/config
+    # Run as root in CI to avoid bind mount permission issues on /data
+    user: "0:0"
     volumes:
       - ./config:/etc/radicale:ro
       - ./data:/data

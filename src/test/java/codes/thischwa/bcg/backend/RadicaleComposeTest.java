@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.ComposeContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -29,6 +30,7 @@ public class RadicaleComposeTest extends AbstractBackendTest {
       new File("src/docker/radicale/docker-compose.yml"))
       .withLocalCompose(true)
       .withPull(true)
+      .withLogConsumer("radicale-it", new Slf4jLogConsumer(log).withPrefix("radicale-it"))
       .withExposedService(
           "radicale-it",
           5232,
