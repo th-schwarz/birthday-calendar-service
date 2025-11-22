@@ -1,15 +1,11 @@
-# just for local testing
-
 services:
   radicale-it:
     image: ghcr.io/kozea/radicale:latest
-    ports:
-      - "127.0.0.1:8081:5232"
-      #- "8081:5232"
+    # Do not bind host ports here; Testcontainers will map them dynamically.
+    expose:
+      - "5232"
     environment:
       - LOG_LEVEL=debug
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     volumes:
       - ./config:/etc/radicale:ro
       - ./data:/data
