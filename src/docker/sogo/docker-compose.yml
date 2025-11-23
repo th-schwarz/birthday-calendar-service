@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:alpine
+    # For local testing, uncomment the 'ports' line below.
+    # For Testcontainers, keep it commented (Testcontainers maps ports dynamically).
+    ports:
+      - "80:80"
+    expose:
+      - "80"
+    volumes:
+      - sogo-webresources:/usr/lib/GNUstep/SOGo/WebServerResources:ro
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      sogo:
+        condition: service_started
+    restart: unless-stopped
+
+  sogo:
+    image: sonroyaalmerol/docker-sogo:latest
+    platform: linux/amd64
+    environment:
+      - TZ=Europe/Berlin
+    volumes:
+      - sogo-webresources:/usr/lib/GNUstep/SOGo/WebServerResources
+      - ./config/sogo.conf:/etc/sogo/sogo.conf:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=sogo
+      - MYSQL_USER=sogo
+      - MYSQL_PASSWORD=sogo
+    volumes:
+      - ./config/init-users.sql:/docker-entrypoint-initdb.d/init-users.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "sogo", "-psogo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  sogo-webresources:
