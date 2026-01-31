@@ -1,10 +1,10 @@
 ## import of the individual configuration settings
 spring:
   config:
-    import: optional:file:./bcg.yml
+    import: optional:file:./bcs.yml
 
-bcg:
-  product: BirthdayCalendarGenerator
+bcs:
+  product: BirthdayCalendarService
   calendar-category: Birthday
   run-on-start: false
   cron: "0 30 4 * * *"

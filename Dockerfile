@@ -24,11 +24,11 @@ RUN useradd -m bcguser
 USER bcguser
 
 # Copy the built jar from the builder stage
-COPY --from=builder /build/target/*.jar /app/bcg.jar
+COPY --from=builder /build/target/*.jar /app/bcs.jar
 
 # Optionally copy default config
-# COPY bcg.yml .
+# COPY bcs.yml .
 # COPY logback.xml .
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["java", "-jar", "bcg.jar"]
+CMD ["java", "-jar", "bcs.jar"]

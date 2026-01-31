@@ -4,7 +4,7 @@
 :source-highlighter: highlightjs
 :highlightjs-languages: yaml,console
 
-= Birthday Calendar Generator :: BCG
+= Birthday Calendar Service :: BCS
 
 image:https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/maven.yml/badge.svg["GitHub CI Build Status",link="https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/maven.yml"]
 image:https://img.shields.io/github/license/th-schwarz/BirthdayCalendarService["License badge for BirthdayCalendarService",link="https://github.com/th-schwarz/BirthdayCalendarService/blob/develop/LICENSE"]
@@ -16,7 +16,7 @@ image:https://ghcr-badge.elias.eu.org/shield/th-schwarz/BirthdayCalendarService/
 
 == Preface
 
-BirthdayCalendarGenerator (BCG): A Java Spring Boot application that creates and synchronizes a birthday calendar from CardDAV address book data. BCG automatically generates recurring birthday events and maintains them through scheduled synchronization with CalDAV servers like SOGO and Baikal. Supports deployment via `command line`, `systemd`, `init.d`, or `Docker containers`.
+BirthdayCalendarService (BCS): A Java Spring Boot application that creates and synchronizes a birthday calendar from CardDAV address book data. BCS automatically generates recurring birthday events and maintains them through scheduled synchronization with CalDAV servers like SOGO and Baikal. Supports deployment via `command line`, `systemd`, `init.d`, or `Docker containers`.
 
 Features:
 
@@ -46,7 +46,7 @@ Single backend tests:
 
 == Basic Workflow
 
-The Birthday Calendar Generator (BCG) is an application designed to generate a birthday calendar from the contact information stored in a CardDAV address book and upload it to a CalDAV calendar. The working process is built upon key parts and is automated using scheduling methods.
+The Birthday Calendar Service (BCS) is an application designed to generate a birthday calendar from the contact information stored in a CardDAV address book and upload it to a CalDAV calendar. The working process is built upon key parts and is automated using scheduling methods.
 
 === General Steps
 
@@ -72,21 +72,21 @@ Here is the suggested file structure:
 [source,bash]
 ----
 ├── /opt/bcg
-│   ├── bcg.yml    (individual configuration)
-│   ├── bcg.jar
+│   ├── bcs.yml    (individual configuration)
+│   ├── bcs.jar
 │   ├── logback.xml    (logback configuration)
 ----
-*bcg.yml* defines the individual properties. The file is read by default and will be merged with the default properties in the classpath, therefore, the file can be kept as small as possible. A minimal configuration example can be found further below. If the file is inside the working directory, it is loaded automatically.  +
-The complete configuration settings can be found link:docs/bcg-configuration.adoc[here].
+*bcs.yml* defines the individual properties. The file is read by default and will be merged with the default properties in the classpath, therefore, the file can be kept as small as possible. A minimal configuration example can be found further below. If the file is inside the working directory, it is loaded automatically.  +
+The complete configuration settings can be found link:docs/bcs-configuration.adoc[here].
 
 === Configuration
 
-Use the individual properties file `bcg.yml` to set e.g., the mandatory dav settings and to override default settings.
+Use the individual properties file `bcs.yml` to set e.g., the mandatory dav settings and to override default settings.
 
 The most important settings are:
 [source,yaml]
 ----
-bcg:
+bcs:
   calendar-category: Birthday  # default
   cron: "0 30 4 * * *"  # default
 dav:
@@ -96,10 +96,10 @@ dav:
   card-url: https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/personal/
 ----
 
-- `bcg.calendar-category`: The value depends on the categories of the caldav server and its localization. +
+- `bcs.calendar-category`: The value depends on the categories of the caldav server and its localization. +
 *This value is used to delete and create birthdays, the value must be set correctly initially and must not be changed!*
-- `bcg.run-on-start`: Optional parameter, default is false. If it true, the sync starts immediately on start.
-- `bcg.cron`: The cron trigger used to schedule the synchronization of birthdays.
+- `bcs.run-on-start`: Optional parameter, default is false. If it true, the sync starts immediately on start.
+- `bcs.cron`: The cron trigger used to schedule the synchronization of birthdays.
 - `dav.user`, `dav.password`: Authentication credentials for the dav server.
 - `dav.card-url`: The address book URL from which birthdays are read.
 - `dav.cal-url`: The url of the birthday calendar which must be created. _To be on the safe side, it's a good idea to use an extra birthday calendar! But it is not mandatory since https://github.com/th-schwarz/BirthdayCalendarService/issues/2[A remote event should only be deleted if its categories contain the defined birthday category.]_ was implemented.
@@ -112,18 +112,18 @@ The fully executable jar can be executed in different ways.
 
 === by Docker
 
-BCG can be run directly from a container image hosted on GitHub Container Registry (GHCR).
+BCS can be run directly from a container image hosted on GitHub Container Registry (GHCR).
 
 [source,bash]
 ----
 # Run with configuration file mounted from the host
 docker run --rm \
-  -v /path/to/bcg.yml:/app/bcg.yml:ro \
+  -v /path/to/bcs.yml:/app/bcs.yml:ro \
   -v /path/to/logback.xml:/app/logback.xml:ro \
   ghcr.io/th-schwarz/bcg:[tagged-version]
 ----
 
-Replace `/path/to/bcg.yml` and `/path/to/logback.xml` with the absolute paths to your configuration and logging files on the host system.
+Replace `/path/to/bcs.yml` and `/path/to/logback.xml` with the absolute paths to your configuration and logging files on the host system.
 
 Allowed values for `tagged-version`:
 
@@ -136,14 +136,14 @@ If you want the application to run once and exit, you can append:
 [source,bash]
 ----
 docker run --rm \
-  -v /path/to/bcg.yml:/app/bcg.yml:ro \
+  -v /path/to/bcs.yml:/app/bcs.yml:ro \
   -v /path/to/logback.xml:/app/logback.xml:ro \
   ghcr.io/th-schwarz/bcg:latest --run-once
 ----
 
 === by Docker Compose
 
-You can also run BCG with Docker Compose for easier service management.
+You can also run BCS with Docker Compose for easier service management.
 
 [source,yaml]
 ----
@@ -153,7 +153,7 @@ services:
     container_name: bcg
     restart: unless-stopped
     volumes:
-      - ./bcg.yml:/app/bcg.yml:ro          # required configuration
+      - ./bcs.yml:/app/bcs.yml:ro          # required configuration
       - ./logback.xml:/app/logback.xml:ro  # optional logging config
     # command: ["--run-once"]              # uncomment to run once and exit
     environment:
@@ -183,21 +183,21 @@ The start by command line looks like:
 [source,bash]
 ----
 cd /opt/bcg/
-java -jar bcg.jar --logging.config=logback.xml --run-once
+java -jar bcs.jar --logging.config=logback.xml --run-once
 ----
 
 If you want the application to execute the birthday calendar synchronization only once and then exit immediately, you can use the `--run-once` parameter (one-time processing).
 
 === by systemd Service
 
-BCG can also be started easily as a systemd service. An example for
+BCS can also be started easily as a systemd service. An example for
 the desired service configuration can be found at the documentation
 link:docs/systemd-configuration.adoc[systemd
 Service Configuration].
 
 === by init.d Service
 
-Another possibility to start BCG is as `init.d` service. Further
+Another possibility to start BCS is as `init.d` service. Further
 information can be found at the documentation of spring boot,
 https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#deployment.installing.nix-services.init-d[Installation
 as an init.d Service (System V)].
