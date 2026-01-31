@@ -138,7 +138,7 @@ If you want the application to run once and exit, you can append:
 docker run --rm \
   -v /path/to/bcs.yml:/app/bcs.yml:ro \
   -v /path/to/logback.xml:/app/logback.xml:ro \
-  ghcr.io/th-schwarz/bcg:latest --run-once
+  ghcr.io/th-schwarz/birthday-calendar-service:latest --run-once
 ----
 
 === by Docker Compose
@@ -148,9 +148,9 @@ You can also run BCS with Docker Compose for easier service management.
 [source,yaml]
 ----
 services:
-  bcg:
-    image: ghcr.io/th-schwarz/bcg:latest   # replace with ghcr.io/th-schwarz/bcg:<tag-name> if needed
-    container_name: bcg
+  bcs:
+    image: ghcr.io/th-schwarz/birthday-calendar-service:latest   # replace with ghcr.io/th-schwarz/birthday-calendar-service:<tag-name> if needed
+    container_name: bcs
     restart: unless-stopped
     volumes:
       - ./bcs.yml:/app/bcs.yml:ro          # required configuration
