@@ -10,19 +10,19 @@
     <packaging>jar</packaging>
 
     <groupId>codes.thischwa</groupId>
-    <artifactId>bcg</artifactId>
-    <version>4.0.1-SNAPSHOT</version>
+    <artifactId>bcs</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
-    <name>Birthday Calendar Generator</name>
+    <name>Birthday Calendar Service</name>
 
     <issueManagement>
-        <url>https://github.com/th-schwarz/BirthdayCalendarGenerator/issues</url>
+        <url>https://github.com/th-schwarz/BirthdayCalendarService/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 
     <scm>
-        <developerConnection>scm:git:git@github.com:th-schwarz/BirthdayCalendarGenerator</developerConnection>
-        <connection>scm:git:git@github.com:th-schwarz/BirthdayCalendarGenerator</connection>
+        <developerConnection>scm:git:git@github.com:th-schwarz/BirthdayCalendarService</developerConnection>
+        <connection>scm:git:git@github.com:th-schwarz/BirthdayCalendarService</connection>
         <tag>HEAD</tag>
     </scm>
 
@@ -161,7 +161,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/codes/thischwa/bcg/backend/**</exclude>
+                        <exclude>**/codes/thischwa/bcs/backend/**</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <spring.profiles.active>test</spring.profiles.active>
@@ -182,7 +182,7 @@
                         </goals>
                         <configuration>
                             <includes>
-                                <include>**/codes/thischwa/bcg/backend/**/*.java</include>
+                                <include>**/codes/thischwa/bcs/backend/**/*.java</include>
                                 <include>**/*IT.java</include>
                             </includes>
                             <systemPropertyVariables>

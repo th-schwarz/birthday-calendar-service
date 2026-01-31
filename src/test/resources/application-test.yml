@@ -2,8 +2,8 @@ spring:
   config:
     import:
 
-bcg:
-  product: BirthdayCalendarGenerator
+bcs:
+  product: BirthdayCalendarService
   calendar-category: Birthday
   cron: "0 30 4 * * SUN"
   run-on-start: false
