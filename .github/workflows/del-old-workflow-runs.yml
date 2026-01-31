@@ -9,7 +9,7 @@ jobs:
       - name: Delete workflow runs
         uses: MajorScruffy/delete-old-workflow-runs@v0.3.0
         with:
-          repository: th-schwarz/BirthdayCalendarService   # replace this with your own repository
+          repository: th-schwarz/birthday-calendar-service   # replace this with your own repository
           older-than-seconds: 604800        # remove all workflow runs older than 7 days
           #older-than-seconds: 14515200        # remove all workflow runs older than 6 months
         env:

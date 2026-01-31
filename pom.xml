@@ -16,13 +16,13 @@
     <name>Birthday Calendar Service</name>
 
     <issueManagement>
-        <url>https://github.com/th-schwarz/BirthdayCalendarService/issues</url>
+        <url>https://github.com/th-schwarz/birthday-calendar-service/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 
     <scm>
-        <developerConnection>scm:git:git@github.com:th-schwarz/BirthdayCalendarService</developerConnection>
-        <connection>scm:git:git@github.com:th-schwarz/BirthdayCalendarService</connection>
+        <developerConnection>scm:git:git@github.com:th-schwarz/birthday-calendar-service</developerConnection>
+        <connection>scm:git:git@github.com:th-schwarz/birthday-calendar-service</connection>
         <tag>HEAD</tag>
     </scm>
 
