@@ -120,7 +120,7 @@ BCS can be run directly from a container image hosted on GitHub Container Regist
 docker run --rm \
   -v /path/to/bcs.yml:/app/bcs.yml:ro \
   -v /path/to/logback.xml:/app/logback.xml:ro \
-  ghcr.io/th-schwarz/bcg:[tagged-version]
+  ghcr.io/th-schwarz/birthday-calendar-service:[tagged-version]
 ----
 
 Replace `/path/to/bcs.yml` and `/path/to/logback.xml` with the absolute paths to your configuration and logging files on the host system.
