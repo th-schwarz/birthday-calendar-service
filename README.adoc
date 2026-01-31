@@ -6,13 +6,13 @@
 
 = Birthday Calendar Generator :: BCG
 
-image:https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/maven.yml/badge.svg["GitHub CI Build Status",link="https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/maven.yml"]
-image:https://img.shields.io/github/license/th-schwarz/BirthdayCalendarGenerator["License badge for BirthdayCalendarGenerator",link="https://github.com/th-schwarz/BirthdayCalendarGenerator/blob/develop/LICENSE"]
+image:https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/maven.yml/badge.svg["GitHub CI Build Status",link="https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/maven.yml"]
+image:https://img.shields.io/github/license/th-schwarz/BirthdayCalendarService["License badge for BirthdayCalendarService",link="https://github.com/th-schwarz/BirthdayCalendarService/blob/develop/LICENSE"]
 
 Give it a try!
-https://github.com/th-schwarz/BirthdayCalendarGenerator/releases[image:https://img.shields.io/github/v/release/th-schwarz/BirthdayCalendarGenerator?include_prereleases[GitHub
-release (latest by date including pre-releases)]]         image:https://img.shields.io/github/downloads/th-schwarz/BirthdayCalendarGenerator/total[GitHub Downloads (all assets, all releases)]
-image:https://ghcr-badge.elias.eu.org/shield/th-schwarz/BirthdayCalendarGenerator/bcg[]
+https://github.com/th-schwarz/BirthdayCalendarService/releases[image:https://img.shields.io/github/v/release/th-schwarz/BirthdayCalendarService?include_prereleases[GitHub
+release (latest by date including pre-releases)]]         image:https://img.shields.io/github/downloads/th-schwarz/BirthdayCalendarService/total[GitHub Downloads (all assets, all releases)]
+image:https://ghcr-badge.elias.eu.org/shield/th-schwarz/BirthdayCalendarService/bcg[]
 
 == Preface
 
@@ -28,7 +28,7 @@ Features:
 * Successful tested with SOGo, Baikal, Radicale +
 see below "Backend Tests"
 
-If you find a bug or certain features are missing, don’t hesitate to file an issue on https://github.com/th-schwarz/BirthdayCalendarGenerator/issues[Github].
+If you find a bug or certain features are missing, don't hesitate to file an issue on https://github.com/th-schwarz/BirthdayCalendarService/issues[Github].
 
 == Disclaimer
 
@@ -36,13 +36,13 @@ I’m not responsible for any data loss, hardware damage or broken keyboards. Th
 
 == Backend Tests
 
-All backend tests: image:https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-tests.yml/badge.svg["GitHub CI All Backend Tests",link="https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-tests.yml"]
+All backend tests: image:https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/backend-tests.yml/badge.svg["GitHub CI All Backend Tests",link="https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/backend-tests.yml"]
 
 Single backend tests:
 
-* image:https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-baikal.yml/badge.svg["GitHub CI Baikal Backend Tests",link="https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-baikal.yml"]
-* image:https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-sogo.yml/badge.svg["GitHub CI Sogo Backend Tests",link="https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-sogo.yml"]
-* image:https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-radicale.yml/badge.svg["GitHub CI Radicale Backend Tests",link="https://github.com/th-schwarz/BirthdayCalendarGenerator/actions/workflows/backend-radicale.yml"]
+* image:https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/backend-baikal.yml/badge.svg["GitHub CI Baikal Backend Tests",link="https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/backend-baikal.yml"]
+* image:https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/backend-sogo.yml/badge.svg["GitHub CI Sogo Backend Tests",link="https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/backend-sogo.yml"]
+* image:https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/backend-radicale.yml/badge.svg["GitHub CI Radicale Backend Tests",link="https://github.com/th-schwarz/BirthdayCalendarService/actions/workflows/backend-radicale.yml"]
 
 == Basic Workflow
 
@@ -102,7 +102,7 @@ dav:
 - `bcg.cron`: The cron trigger used to schedule the synchronization of birthdays.
 - `dav.user`, `dav.password`: Authentication credentials for the dav server.
 - `dav.card-url`: The address book URL from which birthdays are read.
-- `dav.cal-url`: The url of the birthday calendar which must be created. _To be on the safe side, it's a good idea to use an extra birthday calendar! But it is not mandatory since https://github.com/th-schwarz/BirthdayCalendarGenerator/issues/2[A remote event should only be deleted if its categories contain the defined birthday category.]_ was implemented.
+- `dav.cal-url`: The url of the birthday calendar which must be created. _To be on the safe side, it's a good idea to use an extra birthday calendar! But it is not mandatory since https://github.com/th-schwarz/BirthdayCalendarService/issues/2[A remote event should only be deleted if its categories contain the defined birthday category.]_ was implemented.
 - `dav.delay-in-seconds`: This property determines the delay interval (in seconds) between retries in the case of network problems. The default setting is _1_.
 - `dav.retry-delay-in-seconds`: The maximum number of retries due to network errors. The default setting is _5_.
 
@@ -176,7 +176,7 @@ docker compose run --rm bcg --run-once
 
 === by Command Line
 
-Download the https://github.com/th-schwarz/BirthdayCalendarGenerator/releases[last release jar].
+Download the https://github.com/th-schwarz/BirthdayCalendarService/releases[last release jar].
 
 The start by command line looks like:
 
