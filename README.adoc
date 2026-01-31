@@ -71,7 +71,7 @@ Here is the suggested file structure:
 
 [source,bash]
 ----
-├── /opt/bcg
+├── /opt/bcs
 │   ├── bcs.yml    (individual configuration)
 │   ├── bcs.jar
 │   ├── logback.xml    (logback configuration)

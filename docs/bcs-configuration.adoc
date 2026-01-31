@@ -7,7 +7,7 @@
 
 == Default settings
 
-BCG has a lot of configuration settings. Most of them has default settings, but they can be overwritten by the individual configuration file.
+BCS has a lot of configuration settings. Most of them has default settings, but they can be overwritten by the individual configuration file.
 
 Below all default settings are listed.
 
