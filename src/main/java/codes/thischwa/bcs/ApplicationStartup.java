@@ -37,7 +37,7 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
   @Override
   public void onApplicationEvent(final ApplicationReadyEvent event) {
     String profiles = String.join(",", env.getActiveProfiles());
-    log.info("*** Settings for BCG:");
+    log.info("*** Settings for BCS:");
     log.info("  * active profile(s): {}", !StringUtils.hasText(profiles) ? "n/a" : profiles);
     log.info("  * cron: {}", config.cron());
     log.info("  * run on start: {}", config.runOnStart());
