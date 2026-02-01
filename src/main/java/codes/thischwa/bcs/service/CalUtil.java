@@ -23,7 +23,7 @@ import net.fortuna.ical4j.model.property.Uid;
 
 import static codes.thischwa.bcs.service.CalHandler.CALENDAR_CONTENT_TYPE;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Utility class providing methods to work with calendar events and contacts.

@@ -1,7 +1,5 @@
 /** Package for services. */
-@NonNullApi
-@NonNullFields
+@NullMarked
 package codes.thischwa.bcs.conf;
 
-import org.springframework.lang.NonNullApi;
-import org.springframework.lang.NonNullFields;
+import org.jspecify.annotations.NullMarked;

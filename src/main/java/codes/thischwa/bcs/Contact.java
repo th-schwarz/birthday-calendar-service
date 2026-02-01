@@ -2,7 +2,7 @@ package codes.thischwa.bcs;
 
 import java.time.LocalDate;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a contact with personal details such as name and birthday.
