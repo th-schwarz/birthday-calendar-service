@@ -3,4 +3,6 @@
 
 * link:bcs-configuration.adoc[Complete BCG Configuration]
 
+* link:bcs-docker-configuration.adoc[Example BCG Configuration for Docker]
+
 * link:systemd-configuration.adoc[Example of a systemd Configuration]

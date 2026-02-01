@@ -1,0 +1,71 @@
+:source-highlighter: highlightjs
+:highlightjs-languages: yaml, xml
+:toc:
+:toc-title:
+
+= BCG Configuration for Docker
+
+== docker-compose.yml
+
+[source,yaml]
+----
+services:
+  bcs-dockerized:
+    restart: unless-stopped
+    image: ghcr.io/th-schwarz/birthday-calendar-service:develop
+    volumes:
+      - /opt/bcs-dockerized/bcs.yml:/app/bcs.yml:ro
+      - /opt/bcs-dockerized/logback.xml:/app/logback.xml:ro
+      - /opt/bcs-dockerized/log:/app/log
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - LOGGING_CONFIG=/app/logback.xml
+----
+
+== logback.xml
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- Layout/Pattern -->
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <property name="log_path" value="/app/log" />
+  <property name="log_name" value="bcs" />
+
+  <!-- monthly rolling application log, retention period 30d -->
+  <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <property name="app_log" value="${log_path}/${log_name}" />
+    <file>${app_log}.log</file>
+    <encoder>
+      <pattern>%d [%t] %-5level %logger{50} - %msg%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${app_log}.%d{yyyy-MM}.log.gz</fileNamePattern>
+      <maxHistory>12</maxHistory>
+    </rollingPolicy>
+  </appender>
+
+
+  <logger name="org.apache.http" level="info" />
+  <logger name="org.springframework.boot.autoconfigure.logging" level="info" />
+  <logger name="org.springframework.context.annotation.ClassPathBeanDefinitionScanner"
+    level="info" />
+  <logger name="org.springframework.web" level="info" />
+  <logger name="org.springframework.beans" level="info" />
+  <logger name="org.thymeleaf" level="info" />
+  <logger name="org.xnio.nio" level="warn" />
+  <logger name="com.zaxxer.hikari.pool" level="info" />
+
+  <root level="debug">
+    <appender-ref ref="file" />
+  </root>
+</configuration>
+----

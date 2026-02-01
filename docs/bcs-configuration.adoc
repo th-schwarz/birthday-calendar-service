@@ -13,7 +13,7 @@ Below all default settings are listed.
 
 [source,yaml]
 // include is disabled on github
-// application.yml 2025-07
+// application.yml 2026-01
 ----
 bcs:
   product: BirthdayCalendarService
