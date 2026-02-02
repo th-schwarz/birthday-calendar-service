@@ -7,9 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.jspecify.annotations.Nullable;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Configuration properties for event-related settings. These properties are mapped from
@@ -19,13 +18,23 @@ import org.jspecify.annotations.Nullable;
 @ConfigurationProperties(prefix = "event")
 public class EventConf {
 
-  private String summary;
-  private String description;
+  private final String summary;
+  private final String description;
   private @Getter String dateFormat;
 
   @Nullable
   private @Getter Duration alarmDuration;
 
+  /**
+   * Constructs a new EventConf instance with the specified configuration properties.
+   *
+   * @param summary     A summary template containing placeholders for event information.
+   * @param description A description template containing placeholders for event details.
+   * @param dateFormat  The date format used for parsing and formatting date values.
+   * @param alarm       The alarm configuration in the format `<number>[dh]` where `d` stands for days
+   *                    and `h` stands for hours. If the format is invalid or blank, no alarm duration
+   *                    will be set.
+   */
   public EventConf(String summary, String description, String dateFormat, String alarm) {
     this.summary = summary;
     this.description = description;
@@ -57,7 +66,7 @@ public class EventConf {
    *
    * @param contact The person whose details will be used to populate the summary template.
    * @return A string containing the generated summary with placeholders replaced by the person's
-   * details.
+   *     details.
    */
   public String generateSummary(Contact contact) {
     return replace(summary, contact);
@@ -69,7 +78,7 @@ public class EventConf {
    *
    * @param contact The person whose details will be used to populate the description template.
    * @return A string containing the generated description with placeholders replaced by the
-   * person's details.
+   *     person's details.
    */
   public String generateDescription(Contact contact) {
     return replace(description, contact);

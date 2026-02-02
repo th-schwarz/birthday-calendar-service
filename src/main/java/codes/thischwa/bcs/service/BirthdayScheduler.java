@@ -27,7 +27,7 @@ public class BirthdayScheduler {
    * generation of the birthday calendar using the provided BirthdayCalGenerator instance.
    *
    * @param birthdayCalGenerator the generator responsible for processing and generating the
-   *     birthday calendar
+   *                             birthday calendar
    */
   public BirthdayScheduler(BirthdayCalGenerator birthdayCalGenerator) {
     this.birthdayCalGenerator = birthdayCalGenerator;

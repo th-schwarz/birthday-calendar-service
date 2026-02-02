@@ -7,18 +7,11 @@ import com.github.sardine.Sardine;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.vcard.VCard;
 import net.fortuna.ical4j.vcard.VCardBuilder;
-import net.fortuna.ical4j.vcard.property.BDay;
-import net.fortuna.ical4j.vcard.property.Fn;
-import net.fortuna.ical4j.vcard.property.N;
-
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
@@ -64,10 +57,8 @@ public class CardHandler {
 
       for (DavResource davResource : vcardResources) {
         log.info("Processing contact: {}",
-            (davResource.getDisplayName() == null ||
-                davResource.getDisplayName().isEmpty()) ?
-                davResource.toString() :
-                davResource.getDisplayName());
+            (davResource.getDisplayName() == null || davResource.getDisplayName().isEmpty())
+                ? davResource.toString() : davResource.getDisplayName());
         URI href = new URI(davConf.getBaseUrl() + davResource.getHref().toString());
         try (InputStream vCardStream = sardine.get(href.toString())) {
           byte[] vcfContent = IOUtils.toByteArray(vCardStream);

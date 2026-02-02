@@ -1,4 +1,7 @@
-/** Package for services. */
+/**
+ * Package for services.
+ */
+
 @NullMarked
 package codes.thischwa.bcs.conf;
 

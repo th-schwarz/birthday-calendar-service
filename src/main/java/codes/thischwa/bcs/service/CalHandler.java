@@ -81,7 +81,7 @@ public class CalHandler {
     Map<String, URL> existingEventUris = new HashMap<>();
 
     for (VEvent event : allBirthdayEvents.keySet()) {
-      String uuid = CalUtil.extractContactsUUIDFromEvent(event);
+      String uuid = CalUtil.extractContactsUuidFromEvent(event);
       existingEvents.put(uuid, event);
       String eventId = CalUtil.extractEventId(allBirthdayEvents.get(event));
       existingEventUris.put(eventId, allBirthdayEvents.get(event));

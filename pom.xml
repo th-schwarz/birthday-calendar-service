@@ -52,6 +52,17 @@
         </checkstyle.propertyExpansion>
         <checkstyle.consoleOutput>true</checkstyle.consoleOutput>
         <linkXRef>false</linkXRef>
+
+        <!-- checkstyle -->
+        <checkstyle.version>12.3.0</checkstyle.version>
+        <checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
+        <checkstyle.config.location>${project.basedir}/src/checkstyle/google_custom_checks.xml
+        </checkstyle.config.location>
+        <checkstyle.includeTestResources>false</checkstyle.includeTestResources>
+        <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
+        <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
+        <checkstyle.consoleOutput>true</checkstyle.consoleOutput>
+        <linkXRef>false</linkXRef>
     </properties>
 
     <dependencies>

@@ -1,7 +1,6 @@
 package codes.thischwa.bcs;
 
 import java.time.LocalDate;
-
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -16,6 +15,15 @@ import org.jspecify.annotations.Nullable;
 public record Contact(String firstName, String lastName, String displayName,
                       @Nullable LocalDate birthday, @Nullable String identifier) {
 
+  /**
+   * Constructs a new Contact instance with the specified first name, last name, display name,
+   * and birthday. The identifier is set to null by default.
+   *
+   * @param firstName   The first name of the contact.
+   * @param lastName    The last name of the contact.
+   * @param displayName The display name of the contact.
+   * @param birthday    The birthday of the contact, or null if not specified.
+   */
   public Contact(String firstName, String lastName, String displayName, @Nullable LocalDate birthday) {
     this(firstName, lastName, displayName, birthday, null);
   }

@@ -1,11 +1,12 @@
 package codes.thischwa.bcs.service;
 
+import static codes.thischwa.bcs.service.CalHandler.CALENDAR_CONTENT_TYPE;
+
 import codes.thischwa.bcs.Contact;
 import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -20,9 +21,6 @@ import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Uid;
-
-import static codes.thischwa.bcs.service.CalHandler.CALENDAR_CONTENT_TYPE;
-
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -39,12 +37,13 @@ public class CalUtil {
    * @return the contact's UUID as a string
    * @throws IllegalArgumentException if the UID property is not found in the event
    */
-  public static String extractContactsUUIDFromEvent(VEvent event) {
+  public static String extractContactsUuidFromEvent(VEvent event) {
     try {
       Property p = event.getProperty(Uid.UID).orElseThrow();
       String uuid = p.getValue();
-      if (uuid.endsWith(".vcf"))
+      if (uuid.endsWith(".vcf")) {
         uuid = uuid.substring(0, uuid.lastIndexOf('.'));
+      }
       return uuid;
     } catch (NoSuchElementException e) {
       throw new IllegalArgumentException(e);
@@ -61,8 +60,9 @@ public class CalUtil {
   public static String extractEventId(URL inputUrl) {
     String path = inputUrl.getPath();
     String fileName = path.substring(path.lastIndexOf('/') + 1);
-    if (fileName.contains("."))
+    if (fileName.contains(".")) {
       fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+    }
     return fileName;
   }
 
@@ -80,6 +80,17 @@ public class CalUtil {
     return personBirthday.equals(eventBirthday);
   }
 
+  /**
+   * Collects and returns a map of birthday events along with their corresponding URLs from a calendar resource.
+   * The method processes the provided calendar URL to list all entries, filters for calendar content,
+   * and attempts to parse and convert them into VEvent objects.
+   *
+   * @param sardine the Sardine HTTP client used for interacting with the DAV server
+   * @param calUrl  the URL of the calendar resource to scan for events
+   * @return a map where the key is the VEvent object representing a birthday event,
+   *     and the value is the URL of the corresponding calendar entry
+   * @throws IOException if an I/O error occurs during interaction with the remote server
+   */
   public static Map<VEvent, URL> collectBirthdayEvents(Sardine sardine, String calUrl)
       throws IOException {
     Map<VEvent, URL> events = new HashMap<>();
@@ -95,6 +106,17 @@ public class CalUtil {
     return events;
   }
 
+  /**
+   * Converts an event behindURL into a VEvent object by retrieving and parsing the content using the provided Sardine client.
+   * This method fetches the data from the given URL, processes it as an iCalendar object, and extracts the VEvent component.
+   * If the data cannot be parsed or does not contain exactly one VEvent, an exception is thrown.
+   *
+   * @param sardine  the Sardine HTTP client used to interact with the DAV server
+   * @param eventUrl the URL of the calendar event to be converted into a VEvent object
+   * @return a VEvent object if successfully parsed and found, or null if no event could be parsed
+   * @throws IllegalArgumentException if the URL content cannot be parsed, the data is invalid,
+   *                                  or it contains an unexpected number of calendar components
+   */
   public static @Nullable VEvent convert(Sardine sardine, URL eventUrl)
       throws IllegalArgumentException {
     try (InputStream inputStream = sardine.get(eventUrl.toString())) {
@@ -103,9 +125,8 @@ public class CalUtil {
         CalendarBuilder builder = new CalendarBuilder();
         Calendar calendar = builder.build(inputStream);
         if (calendar.getComponents().size() != 1) {
-          throw new IllegalArgumentException(
-              "Unexpected number of calendar components: " + calendar.getComponents().size() +
-                  " for URL: " + eventUrl + " (expected: 1)");
+          throw new IllegalArgumentException("Unexpected number of calendar components: " + calendar.getComponents().size()
+              + " for URL: " + eventUrl + " (expected: 1)");
         }
 
         CalendarComponent component = calendar.getComponents().get(0);

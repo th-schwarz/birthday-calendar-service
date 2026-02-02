@@ -11,7 +11,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-/** The ApplicationStartup class processes some tasks if the application is ready to start. */
+/**
+ * The ApplicationStartup class processes some tasks if the application is ready to start.
+ */
 @Component
 @Profile({"!test", "!backend-test"})
 @Slf4j
@@ -25,7 +27,9 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
 
   private final Environment env;
 
-  /** Initializes the application on startup. */
+  /**
+   * Initializes the application on startup.
+   */
   public ApplicationStartup(
       BcsConf config, DavConf davConf, BirthdayCalGenerator birthdayCalGenerator, Environment env) {
     this.config = config;
