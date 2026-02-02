@@ -12,7 +12,7 @@ image:https://img.shields.io/github/license/th-schwarz/birthday-calendar-service
 Give it a try!
 https://github.com/th-schwarz/birthday-calendar-service/releases[image:https://img.shields.io/github/v/release/th-schwarz/birthday-calendar-service?include_prereleases[GitHub
 release (latest by date including pre-releases)]]         image:https://img.shields.io/github/downloads/th-schwarz/birthday-calendar-service/total[GitHub Downloads (all assets, all releases)]
-image:https://ghcr-badge.elias.eu.org/shield/th-schwarz/birthday-calendar-service/bcg[]
+image:https://ghcr-badge.elias.eu.org/shield/th-schwarz/birthday-calendar-service/birthday-calendar-service[]
 
 == Preface
 
@@ -25,7 +25,8 @@ Features:
 * Automated scheduling with cron
 * Docker support
 * Java 17+ compatible
-* Successful tested with SOGo, Baikal, Radicale +
+* Spring Boot 4.x
+* Successfully tested with SOGo, Baikal, Radicale +
 see below "Backend Tests"
 
 If you find a bug or certain features are missing, don't hesitate to file an issue on https://github.com/th-schwarz/birthday-calendar-service/issues[Github].

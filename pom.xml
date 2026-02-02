@@ -32,14 +32,14 @@
         <project.build.sourceEncoding>${file.encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${file.encoding}</project.reporting.outputEncoding>
 
-        <ical4j.version>4.1.1</ical4j.version>
-        <ical4j-vcard.version>2.0.1</ical4j-vcard.version>
+        <ical4j.version>4.2.3</ical4j.version>
+        <ical4j-vcard.version>2.1.0</ical4j-vcard.version>
         <sardine.version>5.13</sardine.version>
-        <testcontainers.version>1.21.3</testcontainers.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
 
         <!-- checkstyle -->
-        <checkstyle.version>10.8.1</checkstyle.version>
-        <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
+        <checkstyle.version>12.3.1</checkstyle.version>
+        <checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
         <checkstyle.config.location>google_checks.xml</checkstyle.config.location>
         <checkstyle.includeTestResources>false</checkstyle.includeTestResources>
         <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
