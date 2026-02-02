@@ -1,6 +1,8 @@
 # Stage 1: Build the JAR using Maven
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
+LABEL org.opencontainers.image.description="Birthday Calendar Service creates and synchronizes a birthday calendar from CardDAV address book data."
+
 WORKDIR /build
 
 # Copy pom.xml and download dependencies first (for Docker cache)
@@ -20,8 +22,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y tini && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
-RUN useradd -m bcguser
-USER bcguser
+RUN useradd -m bcsuser
+USER bcsuser
 
 # Copy the built jar from the builder stage
 COPY --from=builder /build/target/*.jar /app/bcs.jar
