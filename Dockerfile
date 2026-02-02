@@ -1,3 +1,5 @@
+LABEL org.opencontainers.image.description="Birthday Calendar Service creates and synchronizes a birthday calendar from CardDAV address book data."
+
 # Stage 1: Build the JAR using Maven
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
