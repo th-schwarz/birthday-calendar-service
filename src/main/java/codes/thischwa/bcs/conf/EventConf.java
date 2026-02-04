@@ -20,10 +20,11 @@ public class EventConf {
 
   private final String summary;
   private final String description;
-  private @Getter String dateFormat;
 
   @Nullable
   private @Getter Duration alarmDuration;
+
+  private final DateTimeFormatter formatter;
 
   /**
    * Constructs a new EventConf instance with the specified configuration properties.
@@ -38,7 +39,6 @@ public class EventConf {
   public EventConf(String summary, String description, String dateFormat, String alarm) {
     this.summary = summary;
     this.description = description;
-    this.dateFormat = dateFormat;
 
     if (!alarm.isBlank()) {
       Pattern pattern = Pattern.compile("(\\d+)([dh])");
@@ -53,11 +53,15 @@ public class EventConf {
         }
       } else {
         log.warn("Invalid alarm configuration found. Expected format: <number>[dh], actual: {}", alarm);
+        throw new IllegalArgumentException("Invalid alarm configuration: " + alarm);
       }
 
     } else {
       log.debug("No alarm configuration found.");
+      throw new IllegalArgumentException("No alarm configuration found.");
     }
+
+    formatter = DateTimeFormatter.ofPattern(dateFormat);
   }
 
   /**
@@ -85,9 +89,8 @@ public class EventConf {
   }
 
   private String replace(String template, Contact contact) {
-    DateTimeFormatter df = DateTimeFormatter.ofPattern(dateFormat);
     return template.replace("~first-name~", contact.firstName())
         .replace("~last-name~", contact.lastName()).replace("~display-name~", contact.displayName())
-        .replace("~birthday~", df.format(contact.birthday()));
+        .replace("~birthday~", formatter.format(contact.birthday()));
   }
 }
