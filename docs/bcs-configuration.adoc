@@ -43,7 +43,7 @@ Event settings:
 
 - `event.summary`: The title of the birthday event.
 - `event.description`: The description of the birthday event.
-- `event.date-format`: The format of the birthday date.
+- `event.date-format`: The format of the birthday date used for generating the description of the birthday event.
 - `event.alarm`: Triggers a notification **before** the birthday event. Expected format: <number>[dh] +
 d=day, h=hours +
 E.g.: _12h_ triggers a notification 12 hours before the birthday event.

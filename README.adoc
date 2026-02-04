@@ -107,6 +107,8 @@ dav:
 - `dav.delay-in-seconds`: This property determines the delay interval (in seconds) between retries in the case of network problems. The default setting is _1_.
 - `dav.retry-delay-in-seconds`: The maximum number of retries due to network errors. The default setting is _5_.
 
+There are additional settings for the birthday event. For further information have a look at the link:docs/bcs-configuration.adoc[Complete BCS Configuration].
+
 == Start
 
 The fully executable jar can be executed in different ways.

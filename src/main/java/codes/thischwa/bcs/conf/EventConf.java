@@ -31,7 +31,7 @@ public class EventConf {
    *
    * @param summary     A summary template containing placeholders for event information.
    * @param description A description template containing placeholders for event details.
-   * @param dateFormat  The date format used for parsing and formatting date values.
+   * @param dateFormat  The date format used for generating the description of the birthday event.
    * @param alarm       The alarm configuration in the format `<number>[dh]` where `d` stands for days
    *                    and `h` stands for hours. If the format is invalid or blank, no alarm duration
    *                    will be set.
