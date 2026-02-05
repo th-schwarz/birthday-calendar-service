@@ -185,7 +185,7 @@ The start by command line looks like:
 
 [source,bash]
 ----
-cd /opt/bcg/
+cd /opt/bcs/
 java -jar bcs.jar --logging.config=logback.xml --run-once
 ----
 
