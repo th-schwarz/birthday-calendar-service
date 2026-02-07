@@ -23,7 +23,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Java and Maven
-        uses: ./.github/actions/setup-java-maven/action.yml
+        uses: ./.github/actions/setup-java-maven/
 
       - name: Configure Git
         run: |
