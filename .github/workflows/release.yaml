@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'Release version (e.g., 1.0.2)'
+        required: true
+      next-version:
+        description: 'Next SNAPSHOT version (e.g., 1.0.3-SNAPSHOT)'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Java and Maven
+        uses: ./.github/actions/setup-java-maven/action.yml
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Maven Release Clean
+        run: mvn release:clean
+      
+      - name: Maven Release Prepare
+        run: |
+          mvn release:prepare \
+            -DreleaseVersion=${{ github.event.inputs.release-version }} \
+            -DdevelopmentVersion=${{ github.event.inputs.next-version }} \
+            -Prelease \
+            -B
+      
+      - name: Maven Release Perform
+        run: mvn release:perform -Prelease -B
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.event.inputs.release-version }}
+          name: Release ${{ github.event.inputs.release-version }}
+          draft: false
+          prerelease: ${{ contains(github.event.inputs.release-version, 'beta') || contains(github.event.inputs.release-version, 'alpha') }}
+          files: target/checkout/target/bcs-${{ github.event.inputs.release-version }}.jar
+          generate_release_notes: true
