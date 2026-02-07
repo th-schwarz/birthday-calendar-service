@@ -29,8 +29,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       
-      - name: Maven Release Clean
+      - name: Maven Release Prepare
         run: mvn release:clean
       
       - name: Maven Release Prepare
@@ -38,6 +39,8 @@ jobs:
           mvn release:prepare \
             -DreleaseVersion=${{ github.event.inputs.release-version }} \
             -DdevelopmentVersion=${{ github.event.inputs.next-version }} \
+            -Darguments="-DskipTests" \
+            -DscmCommentPrefix="[release] " \
             -Prelease \
             -B
       
