@@ -6,7 +6,9 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-/** Service responsible for generating and uploading birthday calendars. */
+/**
+ * Service responsible for generating and uploading birthday calendars.
+ */
 @Service
 @Slf4j
 public class BirthdayCalGenerator {

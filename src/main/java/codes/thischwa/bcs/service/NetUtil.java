@@ -6,7 +6,7 @@ import java.net.URL;
  * Utility class for performing network-related operations.
  */
 public class NetUtil {
-  
+
   /**
    * Extracts the base URL from a given full URL.
    * The base URL includes the protocol, host, and optionally the port if it is explicitly defined

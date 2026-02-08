@@ -7,12 +7,12 @@ import org.springframework.web.util.UriComponentsBuilder;
  * Configuration properties for DAV integration. These properties are mapped from configuration
  * sources with the prefix `dav`.
  *
- * @param user           The username for authentication.
- * @param password       The password for authentication.
- * @param calUrl         The URL for accessing calendar services.
- * @param cardUrl        The URL for accessing address book services.
+ * @param user                The username for authentication.
+ * @param password            The password for authentication.
+ * @param calUrl              The URL for accessing calendar services.
+ * @param cardUrl             The URL for accessing address book services.
  * @param retryDelayInSeconds The delay in seconds for scheduled tasks or updates.
- * @param maxRetries The maximum number of trials for a specific operation.
+ * @param maxRetries          The maximum number of trials for a specific operation.
  */
 @ConfigurationProperties(prefix = "dav")
 public record DavConf(
