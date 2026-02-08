@@ -47,3 +47,11 @@ jobs:
           mvn release:perform \
             -Darguments="-DskipTests -Dcheckstyle.skip -Dmaven.deploy.skip=true" \
             -B
+
+      - name: Sync main branch with tag
+        run: |
+          VERSION=${{ github.event.inputs.release_version }}
+          TAG="v$VERSION"
+
+          # Force push the tag's commit to main branch
+          git push origin $TAG^{}:main --force
