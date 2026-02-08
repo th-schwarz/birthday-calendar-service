@@ -27,6 +27,7 @@
     <scm>
         <developerConnection>scm:git:git@github.com:th-schwarz/birthday-calendar-service</developerConnection>
         <connection>scm:git:git@github.com:th-schwarz/birthday-calendar-service</connection>
+        <url>https://github.com/th-schwarz/birthday-calendar-service.git</url>
         <tag>HEAD</tag>
     </scm>
 

@@ -1,0 +1,55 @@
+name: Build Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version (e.g. 1.2.0)'
+        required: true
+      next_snapshot_version:
+        description: 'Next snapshot version (e.g. 1.3.0-SNAPSHOT)'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout develop branch
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - name: Setup Java and Maven
+        uses: ./.github/actions/setup-java-maven/
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Maven Release Prepare
+        run: |
+          mvn release:prepare \
+            -DreleaseVersion=${{ github.event.inputs.release_version }} \
+            -DdevelopmentVersion=${{ github.event.inputs.next_snapshot_version }} \
+            -Darguments="-DskipTests -Dcheckstyle.skip" \
+            -B
+
+      - name: Maven Release Perform
+        run: |
+          mvn release:perform \
+            -Darguments="-DskipTests -Dcheckstyle.skip -Dmaven.deploy.skip=true" \
+            -B
+
+      - name: Sync main branch with tag
+        run: |
+          VERSION=${{ github.event.inputs.release_version }}
+          TAG="v$VERSION"
+          
+          # Force push the tag to main branch
+          git push origin $TAG:main --force
