@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.0.2</version>
-        <relativePath/> <!-- lookup parent -->
+        <relativePath /> <!-- lookup parent -->
     </parent>
     <packaging>jar</packaging>
 
     <groupId>codes.thischwa</groupId>
     <artifactId>bcs</artifactId>
-    <version>1.0.0-beta.2-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <name>Birthday Calendar Service</name>
     <description>Birthday Calendar Service creates and synchronizes a birthday calendar from CardDAV address book
