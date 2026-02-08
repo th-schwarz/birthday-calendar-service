@@ -16,6 +16,7 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout develop branch
@@ -46,11 +47,3 @@ jobs:
           mvn release:perform \
             -Darguments="-DskipTests -Dcheckstyle.skip -Dmaven.deploy.skip=true" \
             -B
-
-      - name: Sync main branch with tag
-        run: |
-          VERSION=${{ github.event.inputs.release_version }}
-          TAG="v$VERSION"
-          
-          # Force push the tag to main branch
-          git push origin $TAG:main --force
