@@ -174,7 +174,7 @@ docker compose up -d
 Run the container once and exit:
 [source,bash]
 ----
-docker compose run --rm bcg --run-once
+docker compose run --rm bcs --run-once
 ----
 
 === by Command Line
