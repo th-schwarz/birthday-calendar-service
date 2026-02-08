@@ -14,6 +14,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
 
     steps:
       - name: Checkout repository
@@ -24,3 +27,14 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
+
+      - name: Publish Test Report
+        uses: dorny/test-reporter@v1
+        if: ${{ always() }}
+        with:
+          name: Summary of JUnit Tests
+          path: "**/target/*-reports/TEST-*.xml"
+          reporter: java-junit
+          only-summary: 'true'
+          list-suites: 'failed'
+          list-tests: 'failed'
