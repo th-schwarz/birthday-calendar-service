@@ -26,7 +26,5 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: Test Summary
-        uses: test-summary/action@v2
-        with:
-          paths: "target/surefire-reports/TEST-*.xml"
-        if: always()
+        uses: jeantessier/test-summary-action@v1
+        if: ${{ always() }}
