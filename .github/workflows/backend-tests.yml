@@ -8,9 +8,9 @@ on:
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
+      checks: write
 
     steps:
       - name: Checkout repository
