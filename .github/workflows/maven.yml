@@ -33,8 +33,6 @@ jobs:
         if: ${{ always() }}
         with:
           name: Maven Tests
-          path: |
-            **/target/surefire-reports/*.xml
-            **/target/failsafe-reports/*.xml
+          path: "**/target/*-reports/TEST-*.xml"
           reporter: java-junit
 
