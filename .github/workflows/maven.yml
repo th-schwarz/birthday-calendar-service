@@ -13,7 +13,6 @@ on:
 
 jobs:
   build_and_test:
-    name: Build and Test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -37,5 +36,5 @@ jobs:
           path: "**/target/*-reports/TEST-*.xml"
           reporter: java-junit
           only-summary: 'true'
-#          list-suites: 'failed'
-#          list-tests: 'failed'
+          list-suites: 'failed'
+          list-tests: 'failed'
