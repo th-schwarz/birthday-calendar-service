@@ -12,7 +12,7 @@ on:
     types: [ opened, synchronize, reopened ]
 
 jobs:
-  build:
+  build_and_test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -25,7 +25,7 @@ jobs:
       - name: Setup Java and Maven
         uses: ./.github/actions/setup-java-maven/
 
-      - name: Build with Maven
+      - name: Build and Test
         run: mvn -B package --file pom.xml
 
       - name: Publish Test Report
