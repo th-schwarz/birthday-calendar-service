@@ -24,3 +24,14 @@ jobs:
 
       - name: Run Backend Tests (with Testcontainers)
         run: mvn clean verify -B
+
+      - name: Publish Test Report
+        uses: dorny/test-reporter@v1
+        if: ${{ always() }}
+        with:
+          name: Summary of JUnit Tests
+          path: "**/target/*-reports/TEST-*.xml"
+          reporter: java-junit
+          only-summary: 'true'
+          list-suites: 'failed'
+          list-tests: 'failed'

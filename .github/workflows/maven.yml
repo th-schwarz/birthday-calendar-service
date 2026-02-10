@@ -32,7 +32,7 @@ jobs:
         uses: dorny/test-reporter@v1
         if: ${{ always() }}
         with:
-          name: Maven Tests
+          name: Summary of JUnit Tests
           path: "**/target/*-reports/TEST-*.xml"
           reporter: java-junit
           only-summary: 'true'
