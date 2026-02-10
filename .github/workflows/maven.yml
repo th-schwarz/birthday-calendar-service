@@ -35,6 +35,5 @@ jobs:
           name: Summary of JUnit Tests
           path: "**/target/*-reports/TEST-*.xml"
           reporter: java-junit
-          only-summary: 'true'
           list-suites: 'failed'
           list-tests: 'failed'
