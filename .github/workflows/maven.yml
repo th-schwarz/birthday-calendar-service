@@ -12,6 +12,7 @@ on:
     branches:
       - develop
       - feature*
+  workflow_dispatch:
   pull_request:
     types: [ opened, synchronize, reopened ]
 
