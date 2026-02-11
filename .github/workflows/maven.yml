@@ -39,7 +39,8 @@ jobs:
         if: ${{ always() }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Summary of JUnit Tests
+          artifact: '**/target/(*)-reports'
+          name: 'Summary of JUnit Tests $1'
           path: "**/target/*-reports/TEST-*.xml"
           reporter: java-junit
           only-summary: 'true'
