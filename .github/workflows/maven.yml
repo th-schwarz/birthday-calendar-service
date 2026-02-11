@@ -34,13 +34,20 @@ jobs:
       - name: Build and Test
         run: mvn -B package --file pom.xml
 
+      - name: Upload Test Results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "**/target/*-reports/TEST-*.xml"
+
       - name: Publish Test Report
         uses: dorny/test-reporter@v1.9.1
         if: ${{ always() }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifact: '**/target/(*)-reports'
-          name: 'Summary of JUnit Tests $1'
+          artifact: test-results
+          name: 'Summary of JUnit Tests'
           path: "**/target/*-reports/TEST-*.xml"
           reporter: java-junit
           only-summary: 'true'
