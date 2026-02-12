@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read
       checks: write
 
     steps:
@@ -35,11 +36,11 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: Publish Test Report
-        uses: dorny/test-reporter@v1.9.1
+        uses: dorny/test-reporter@v2
         if: ${{ always() }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Summary of JUnit Tests
           path: "**/target/*-reports/TEST-*.xml"
           reporter: java-junit
-          only-summary: 'true'
+          #only-summary: 'true'
