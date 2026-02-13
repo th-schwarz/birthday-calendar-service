@@ -31,11 +31,10 @@ jobs:
         run: mvn clean verify -B
 
       - name: Publish Test Report
-        uses: dorny/test-reporter@v1.9.1
+        uses: dorny/test-reporter@v2
         if: ${{ always() }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Summary of JUnit Tests
           path: "**/target/*-reports/TEST-*.xml"
           reporter: java-junit
-          only-summary: true
