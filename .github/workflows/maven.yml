@@ -36,10 +36,8 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: Publish Test Report
-        uses: dorny/test-reporter@v2
+        uses: ./.github/actions/publish-report/
         if: ${{ always() }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Summary of JUnit Tests
-          path: "**/target/*-reports/TEST-*.xml"
-          reporter: java-junit
+          report-name: Summary of JUnit Tests
