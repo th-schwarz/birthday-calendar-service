@@ -4,15 +4,11 @@ import codes.thischwa.bcs.Contact;
 import codes.thischwa.bcs.conf.DavConf;
 import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import net.fortuna.ical4j.vcard.VCard;
-import net.fortuna.ical4j.vcard.VCardBuilder;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,26 +49,24 @@ public class CardHandler {
           .stream()
           .filter(item -> !item.isDirectory())
           .toList();
-      log.info("Contacts found: {}", vcardResources.size());
+      log.info("dav resources found to process: {}", vcardResources.size());
 
       for (DavResource davResource : vcardResources) {
-        log.info("Processing contact: {}",
-            (davResource.getDisplayName() == null || davResource.getDisplayName().isEmpty())
-                ? davResource.toString() : davResource.getDisplayName());
+        String resourceName = (davResource.getDisplayName() == null || davResource.getDisplayName().isEmpty())
+            ? davResource.toString() : davResource.getDisplayName();
+        log.info("Processing contact: {}", resourceName);
         URI href = new URI(davConf.getBaseUrl() + davResource.getHref().toString());
         try (InputStream vCardStream = sardine.get(href.toString())) {
-          byte[] vcfContent = IOUtils.toByteArray(vCardStream);
-          VCardBuilder cardBuilder =
-              new VCardBuilder(new ByteArrayInputStream(vcfContent));
-          VCard card = cardBuilder.build();
-          String identifier = CalUtil.extractEventId(href.toURL());
-          Contact contact = CardUtil.convert(card, identifier);
+          Contact contact = CardUtil.buildContact(vCardStream, href);
           contacts.add(contact);
+        } catch (MissingBirthdayException mbe) {
+          log.debug(mbe.getMessage());
         } catch (IllegalArgumentException e) {
-          log.warn("Error while processing contact {}: {}", davResource.getDisplayName(),
+          log.warn("Error while processing contact {}: {}", resourceName,
               e.getMessage());
         }
       }
+      log.info("Contacts with birthday found: {}", contacts.size());
       return contacts;
     } catch (Exception e) {
       throw new IllegalArgumentException(e);

@@ -25,6 +25,7 @@ event:
   summary: "🎂 ~first-name~ ~last-name~"
   description: "Birthday: ~birthday~"
   date-format: yyyy-MM-dd
+  data-format-short: MM-dd
   alarm: 1d
 
 dav:
@@ -44,6 +45,7 @@ Event settings:
 - `event.summary`: The title of the birthday event.
 - `event.description`: The description of the birthday event.
 - `event.date-format`: The format of the birthday date used for generating the description of the birthday event.
+- `event.data-format-short`: The date format used for generating the description when the birthday has no year (e.g. `MonthDay`). Default: `MM-dd`.
 - `event.alarm`: Triggers a notification **before** the birthday event. Expected format: <number>[dh] +
 d=day, h=hours +
 E.g.: _12h_ triggers a notification 12 hours before the birthday event.

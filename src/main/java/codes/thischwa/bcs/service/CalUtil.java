@@ -8,7 +8,7 @@ import com.github.sardine.Sardine;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.time.LocalDate;
+import java.time.temporal.Temporal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,22 +51,6 @@ public class CalUtil {
   }
 
   /**
-   * Extracts the event ID from a given event URI.
-   *
-   * @param inputUrl the URL of the event from which the event ID is to be extracted
-   * @return the extracted event ID as a string
-   * @throws NullPointerException if the provided eventUri is null
-   */
-  public static String extractEventId(URL inputUrl) {
-    String path = inputUrl.getPath();
-    String fileName = path.substring(path.lastIndexOf('/') + 1);
-    if (fileName.contains(".")) {
-      fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-    }
-    return fileName;
-  }
-
-  /**
    * Checks if the specified event corresponds to the contact's birthday.
    *
    * @param bdEvent the VEvent object to be checked
@@ -74,10 +58,9 @@ public class CalUtil {
    * @return true if the event date matches the contact's birthday, false otherwise
    */
   public static boolean isBirthdayEquals(VEvent bdEvent, Contact contact) {
-    LocalDate personBirthday = contact.birthday();
-    DtStart<LocalDate> dtStart = bdEvent.getDateTimeStart();
-    LocalDate eventBirthday = dtStart.getDate();
-    return personBirthday.equals(eventBirthday);
+    DtStart<Temporal> dtStart = bdEvent.getDateTimeStart();
+    Temporal eventBirthday = dtStart.getDate();
+    return TemporalUtil.isSameBirthday(contact.birthday(), eventBirthday);
   }
 
   /**

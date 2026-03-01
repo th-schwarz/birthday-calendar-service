@@ -1,6 +1,8 @@
 package codes.thischwa.bcs;
 
 import java.time.LocalDate;
+import java.time.MonthDay;
+import java.time.temporal.TemporalAccessor;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -9,11 +11,11 @@ import org.jspecify.annotations.Nullable;
  * @param firstName   The first name of the contact.
  * @param lastName    The last name of the contact.
  * @param displayName The display name of the contact.
- * @param birthday    The birthday of the contact.
+ * @param birthday    The birthday of the contact, or null if not specified. Must be an instance of {@link MonthDay} or {@link LocalDate}.
  * @param identifier  The unique identifier of the contact.
  */
 public record Contact(String firstName, String lastName, String displayName,
-                      @Nullable LocalDate birthday, @Nullable String identifier) {
+                      @Nullable TemporalAccessor birthday, @Nullable String identifier) {
 
   /**
    * Constructs a new Contact instance with the specified first name, last name, display name,
@@ -22,9 +24,9 @@ public record Contact(String firstName, String lastName, String displayName,
    * @param firstName   The first name of the contact.
    * @param lastName    The last name of the contact.
    * @param displayName The display name of the contact.
-   * @param birthday    The birthday of the contact, or null if not specified.
+   * @param birthday    The birthday of the contact, or null if not specified. Must be an instance of {@link MonthDay} or {@link LocalDate}.
    */
-  public Contact(String firstName, String lastName, String displayName, @Nullable LocalDate birthday) {
+  public Contact(String firstName, String lastName, String displayName, @Nullable TemporalAccessor birthday) {
     this(firstName, lastName, displayName, birthday, null);
   }
 

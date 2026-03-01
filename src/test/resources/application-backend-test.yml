@@ -8,7 +8,7 @@ event:
   summary: "🎂 ~first-name~ ~last-name~"
   description: "Birthday: ~birthday~"
   date-format: yyyy-MM-dd
-  data-format-short: MM-dd
+  data-format-short: MMMM d
   alarm: 1d
 
 dav:
@@ -17,4 +17,4 @@ dav:
   cal-url: https://dav.my-domain.org/SOGo/dav/dav-user/Calendar/46-12345678-5-87654321/
   card-url: https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/personal/
   max-retries: 5
-  retry-delay-in-seconds: 2
+  retry-delay-in-seconds: 1

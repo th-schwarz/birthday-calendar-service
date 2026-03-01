@@ -13,6 +13,7 @@ import codes.thischwa.bcs.conf.DavConf;
 import codes.thischwa.bcs.service.BirthdayCalGenerator;
 import codes.thischwa.bcs.service.CalUtil;
 import codes.thischwa.bcs.service.SardineInitializer;
+import codes.thischwa.bcs.service.TemporalUtil;
 import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
 import java.io.IOException;
@@ -20,6 +21,9 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.MonthDay;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +32,13 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.vcard.Entity;
+import net.fortuna.ical4j.vcard.VCard;
+import net.fortuna.ical4j.vcard.property.BDay;
+import net.fortuna.ical4j.vcard.property.Fn;
+import net.fortuna.ical4j.vcard.property.N;
+import net.fortuna.ical4j.vcard.property.Uid;
+import net.fortuna.ical4j.vcard.property.Version;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -51,7 +62,7 @@ public abstract class AbstractBackendTest {
   protected SardineInitializer sardineInitializer;
 
   private final Contact janeWithBirthDay = new Contact("Jane", "Doe", "J. Doe",
-      LocalDate.of(1990, 5, 12), "jane0000-0000-0000-0000-000000000000");
+      MonthDay.of(5, 12), "jane0000-0000-0000-0000-000000000000");
   private final Contact johnWithBirthday = new Contact("John", "Smith", "J. Smith",
       LocalDate.of(1985, 11, 3), "john0000-0000-0000-0000-000000000000");
   private final Contact richard = new Contact("Richard", "Smith", "R. Smith", null, "rich0000-0000-0000-0000-000000000000");
@@ -70,16 +81,20 @@ public abstract class AbstractBackendTest {
         .filter(e -> e.getSummary().getValue().contains("Jane"))
         .findFirst()
         .orElseThrow(() -> new AssertionError("Jane Doe's birthday event not found"));
-    assertTrue(dateEquals(bdEvent, janeWithBirthDay.birthday()), "Jane Doe's birthday event should reflect the birthday");
+    assertTrue(TemporalUtil.isSameBirthday(janeWithBirthDay.birthday(), bdEvent.getDateTimeStart().getDate()),
+        "Jane Doe's birthday event should reflect the birthday");
+    assertEquals("Birthday: Mai 12" , bdEvent.getDescription().getValue(), "Jane Doe's birthday event should have the correct description");
     bdEvent = eventsAfterFirstSync.stream()
         .filter(e -> e.getSummary().getValue().contains("John"))
         .findFirst()
         .orElseThrow(() -> new AssertionError("John Smith's birthday event not found"));
-    assertTrue(dateEquals(bdEvent, johnWithBirthday.birthday()), "John Smith's birthday event should reflect the birthday");
+    assertTrue(TemporalUtil.isSameBirthday(johnWithBirthday.birthday(), bdEvent.getDateTimeStart().getDate()),
+        "John Smith's birthday event should reflect the birthday");
+    assertEquals("Birthday: 1985-11-03" , bdEvent.getDescription().getValue(), "John Smith's birthday event should have the correct description");
 
     // 5) Change the birthday of one contact and verify
     log.info("Step 5: Changing Jane Doe's birthday and re-synchronizing");
-    LocalDate janeNewBday = janeWithBirthDay.birthday().plusDays(1);
+    TemporalAccessor janeNewBday = TemporalUtil.addDays(janeWithBirthDay.birthday(), 1);
     Contact janeUpdated = new Contact(janeWithBirthDay.firstName(), janeWithBirthDay.lastName(),
         janeWithBirthDay.displayName(), janeNewBday, janeWithBirthDay.identifier());
     putVCard(davConf.cardUrl() + janeWithBirthDay.identifier(), buildVCard(janeUpdated));
@@ -90,7 +105,9 @@ public abstract class AbstractBackendTest {
     // Check updated BDay
     Optional<VEvent> janeNew = eventsAfterChange.stream().filter(e -> e.getSummary().getValue().contains("Jane")).findFirst();
     assertTrue(janeNew.isPresent(), "Jane's updated event not found after sync");
-    assumeTrue(dateEquals(janeNew.get(), janeNewBday), "Jane's updated event should reflect the changed birthday");
+    bdEvent = janeNew.get();
+    assumeTrue(TemporalUtil.isSameBirthday(janeNewBday, bdEvent.getDateTimeStart().getDate()), "Jane's updated event should reflect the changed birthday");
+    assertEquals("Birthday: Mai 13"  , bdEvent.getDescription().getValue(), "Jane Doe's birthday event should have the correct description");
 
     // 6) Delete a contact with a birthday and verify event removal
     log.info("Step 6: Deleting John Smith contact and re-synchronizing");
@@ -113,10 +130,6 @@ public abstract class AbstractBackendTest {
     log.info("Step 7: Remote cleanup completed");
   }
 
-  private boolean dateEquals(VEvent bdEvent, LocalDate dtStart) {
-    return bdEvent.getDateTimeStart().getDate().equals(dtStart);
-  }
-
   void prepareRemote() throws IOException {
     log.info("Step 1: Clearing remote address book at {}", davConf.cardUrl());
     clearRemoteCard();
@@ -131,20 +144,24 @@ public abstract class AbstractBackendTest {
   }
 
   private String buildVCard(Contact contact) {
-    List<String> lines = new ArrayList<>();
-    lines.add("BEGIN:VCARD");
-    lines.add("VERSION:4.0");
     String uid = contact.identifier().replace(".vcf", "");
-    lines.add("UID:" + uid);
-    lines.add("N:" + contact.lastName() + ";" + contact.firstName() + ";;;");
-    lines.add("FN:" + contact.displayName());
-    LocalDate bday = contact.birthday();
-    if (bday != null) {
-      String val = String.format("%04d%02d%02d", bday.getYear(), bday.getMonthValue(), bday.getDayOfMonth());
-      lines.add("BDAY:" + val);
+    Entity entity = new Entity()
+        .add(new Version("4.0"))
+        .add(new N(contact.lastName(), contact.firstName(), null, null, null))
+        .add(new Fn(contact.displayName()))
+        .add(new Uid(uid));
+    if (contact.birthday() != null) {
+      BDay bDay;
+      if (contact.birthday() instanceof MonthDay) {
+        bDay = TemporalUtil.toBday((MonthDay) contact.birthday());
+      } else {
+        bDay= new BDay<>((LocalDate) contact.birthday());
+      }
+      entity.add(bDay);
     }
-    lines.add("END:VCARD");
-    return String.join("\r\n", lines);
+    VCard card = new VCard();
+    card.add(entity);
+    return card.toString();
   }
 
   void putVCard(String url, String content) throws IOException {

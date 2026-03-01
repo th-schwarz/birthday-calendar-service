@@ -8,6 +8,7 @@ import com.github.sardine.Sardine;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +19,6 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Categories;
@@ -28,7 +28,6 @@ import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Transp;
-import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.transform.recurrence.Frequency;
@@ -83,7 +82,7 @@ public class CalHandler {
     for (VEvent event : allBirthdayEvents.keySet()) {
       String uuid = CalUtil.extractContactsUuidFromEvent(event);
       existingEvents.put(uuid, event);
-      String eventId = CalUtil.extractEventId(allBirthdayEvents.get(event));
+      String eventId = NetUtil.extractUuId(allBirthdayEvents.get(event));
       existingEventUris.put(eventId, allBirthdayEvents.get(event));
     }
 
@@ -163,8 +162,9 @@ public class CalHandler {
     String description = eventConf.generateDescription(contact);
 
     // Create the birthday event as an all-day event
-    LocalDate birthday = contact.birthday();
-    VEvent birthdayEvent = new VEvent(birthday, birthday.plusDays(1), summary.getValue());
+    LocalDate birthday = TemporalUtil.toEventDate(contact.birthday());
+    VEvent birthdayEvent =
+        new VEvent(birthday, Duration.ofDays(1), summary.getValue());
 
     // add the UID
     birthdayEvent.add(new Uid(contact.identifier()));
@@ -173,13 +173,8 @@ public class CalHandler {
     birthdayEvent.add(new RRule<>(new Recur.Builder<LocalDate>().frequency(Frequency.YEARLY).build()));
 
     if (eventConf.getAlarmDuration() != null) {
-      // build and add an alarm
-      VAlarm alarm = new VAlarm();
-
-      // create a trigger with VALUE=DURATION explicitly
-      Trigger trigger = new Trigger(eventConf.getAlarmDuration());
-      trigger.add(Value.DURATION);
-      alarm.add(trigger);
+      // build and add an alarm with negative duration (trigger before event)
+      VAlarm alarm = new VAlarm(eventConf.getAlarmDuration());
       alarm.add(new Action(Action.VALUE_DISPLAY));
       alarm.add(new Description(description));
       alarm.add(summary);

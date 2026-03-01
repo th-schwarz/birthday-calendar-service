@@ -1,0 +1,6 @@
+BEGIN:VCARD
+VERSION:3.0
+N:test;dev;;;
+FN:dev test
+BDAY;VALUE=TEXT:--0315
+END:VCARD

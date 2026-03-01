@@ -33,4 +33,21 @@ public class NetUtil {
       throw new IllegalArgumentException("Invalid URL: " + url, e);
     }
   }
+
+  /**
+   * Extracts the UUID from the provided URL's path. The method takes the last segment of the URL's
+   * path, removes the file extension if present, and returns it as the UUID.
+   *
+   * @param inputUrl the URL object from which the UUID is to be extracted
+   * @return the extracted UUID as a string
+   */
+  public static String extractUuId(URL inputUrl) {
+    String path = inputUrl.getPath();
+    String fileName = path.substring(path.lastIndexOf('/') + 1);
+    if (fileName.contains(".")) {
+      // Remove the file extension
+      fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+    }
+    return fileName;
+  }
 }

@@ -13,6 +13,7 @@ event:
   summary: "🎂 ~first-name~ ~last-name~"
   description: "Birthday: ~birthday~"
   date-format: yyyy-MM-dd
+  data-format-short: MM-dd
   alarm: 1d
 
 dav:

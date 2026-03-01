@@ -2,6 +2,8 @@ package codes.thischwa.bcs.conf;
 
 import codes.thischwa.bcs.Contact;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,17 +28,20 @@ public class EventConf {
 
   private final DateTimeFormatter formatter;
 
+  private final DateTimeFormatter formatterShort;
+
   /**
    * Constructs a new EventConf instance with the specified configuration properties.
    *
-   * @param summary     A summary template containing placeholders for event information.
-   * @param description A description template containing placeholders for event details.
-   * @param dateFormat  The date format used for generating the description of the birthday event.
-   * @param alarm       The alarm configuration in the format `<number>[dh]` where `d` stands for days
-   *                    and `h` stands for hours. If the format is invalid or blank, no alarm duration
-   *                    will be set.
+   * @param summary         A summary template containing placeholders for event information.
+   * @param description     A description template containing placeholders for event details.
+   * @param dateFormat      The date format used for generating the description of the birthday event.
+   * @param dataFormatShort The date format used for generating the description of the birthday event without year.
+   * @param alarm           The alarm configuration in the format `<number>[dh]` where `d` stands for days
+   *                        and `h` stands for hours. If the format is invalid or blank, no alarm duration
+   *                        will be set.
    */
-  public EventConf(String summary, String description, String dateFormat, String alarm) {
+  public EventConf(String summary, String description, String dateFormat, String dataFormatShort, String alarm) {
     this.summary = summary;
     this.description = description;
 
@@ -62,6 +67,7 @@ public class EventConf {
     }
 
     formatter = DateTimeFormatter.ofPattern(dateFormat);
+    formatterShort = DateTimeFormatter.ofPattern(dataFormatShort);
   }
 
   /**
@@ -89,8 +95,10 @@ public class EventConf {
   }
 
   private String replace(String template, Contact contact) {
+    String birthdayStr = (contact.birthday() instanceof MonthDay) ? formatterShort.format(contact.birthday()) :
+        formatter.format(contact.birthday());
     return template.replace("~first-name~", contact.firstName())
         .replace("~last-name~", contact.lastName()).replace("~display-name~", contact.displayName())
-        .replace("~birthday~", formatter.format(contact.birthday()));
+        .replace("~birthday~", birthdayStr);
   }
 }

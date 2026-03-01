@@ -3,6 +3,7 @@ package codes.thischwa.bcs.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.net.URL;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -94,5 +95,57 @@ class NetUtilTest {
     String actualBaseUrl = NetUtil.getBaseUrl(inputUrl);
 
     assertEquals(expectedBaseUrl, actualBaseUrl, "Base URL extraction failed for mismatched port.");
+  }
+
+  @Test
+  void testExtractUuId_withPathWithExtension() throws Exception {
+    URL inputUrl = new URL("https://example.org/some/path/file-1234-abcd.txt");
+    String expectedUuid = "file-1234-abcd";
+    String actualUuid = NetUtil.extractUuId(inputUrl);
+
+    assertEquals(expectedUuid, actualUuid, "UUID extraction failed for a path with an extension.");
+  }
+
+  @Test
+  void testExtractUuId_withPathWithoutExtension() throws Exception {
+    URL inputUrl = new URL("https://example.org/some/path/uuid-5678-efgh");
+    String expectedUuid = "uuid-5678-efgh";
+    String actualUuid = NetUtil.extractUuId(inputUrl);
+
+    assertEquals(expectedUuid, actualUuid, "UUID extraction failed for a path without an extension.");
+  }
+
+  @Test
+  void testExtractUuId_withEmptyPath() throws Exception {
+    URL inputUrl = new URL("https://example.org/");
+    String expectedUuid = "";
+    String actualUuid = NetUtil.extractUuId(inputUrl);
+
+    assertEquals(expectedUuid, actualUuid, "UUID extraction failed for an empty path.");
+  }
+
+  @Test
+  void testExtractUuId_withTrailingSlash() throws Exception {
+    URL inputUrl = new URL("https://example.org/some/path/");
+    String expectedUuid = "";
+    String actualUuid = NetUtil.extractUuId(inputUrl);
+
+    assertEquals(expectedUuid, actualUuid, "UUID extraction failed for a path with a trailing slash.");
+  }
+
+  @Test
+  void testExtractUuId_withNestedPath() throws Exception {
+    URL inputUrl = new URL("https://example.org/nested/path/file-7890-ijkl.json");
+    String expectedUuid = "file-7890-ijkl";
+    String actualUuid = NetUtil.extractUuId(inputUrl);
+
+    assertEquals(expectedUuid, actualUuid, "UUID extraction failed for a nested path.");
+  }
+
+  @Test
+  void testExtractUuId_withInvalidUrl() {
+    assertThrows(NullPointerException.class,
+        () -> NetUtil.extractUuId(null),
+        "Expected exception for null input URL.");
   }
 }
