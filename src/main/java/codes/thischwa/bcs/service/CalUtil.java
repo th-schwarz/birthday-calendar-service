@@ -28,6 +28,9 @@ import org.jspecify.annotations.Nullable;
  */
 public class CalUtil {
 
+  private CalUtil() {
+  }
+
   /**
    * Extracts the UUID of a contact from the provided calendar event.
    * This method attempts to retrieve the value of the UID property from the event.
@@ -113,8 +116,8 @@ public class CalUtil {
         }
 
         CalendarComponent component = calendar.getComponents().get(0);
-        if (component instanceof VEvent) {
-          return (VEvent) component;
+        if (component instanceof VEvent event) {
+          return event;
         }
       }
     } catch (ParserException | IOException e) {
