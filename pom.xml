@@ -42,18 +42,6 @@
         <testcontainers.version>1.21.4</testcontainers.version>
 
         <!-- checkstyle -->
-        <checkstyle.version>12.3.1</checkstyle.version>
-        <checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
-        <checkstyle.config.location>google_checks.xml</checkstyle.config.location>
-        <checkstyle.includeTestResources>false</checkstyle.includeTestResources>
-        <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
-        <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
-        <checkstyle.propertyExpansion>config_loc=${basedir}
-        </checkstyle.propertyExpansion>
-        <checkstyle.consoleOutput>true</checkstyle.consoleOutput>
-        <linkXRef>false</linkXRef>
-
-        <!-- checkstyle -->
         <checkstyle.version>12.3.0</checkstyle.version>
         <checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
         <checkstyle.config.location>${project.basedir}/src/checkstyle/google_custom_checks.xml
@@ -63,6 +51,12 @@
         <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
         <checkstyle.consoleOutput>true</checkstyle.consoleOutput>
         <linkXRef>false</linkXRef>
+
+        <!-- sonarQube cloud  -->
+        <sonar.organization>th-schwarz</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.sourceEncoding>${file.encoding}</sonar.sourceEncoding>
+        <sonar.test.exclusions>src/test/java/**/*</sonar.test.exclusions>
     </properties>
 
     <dependencies>
@@ -204,7 +198,6 @@
                         <configuration>
                             <includes>
                                 <include>**/codes/thischwa/bcs/backend/**/*.java</include>
-                                <include>**/*IT.java</include>
                             </includes>
                             <systemPropertyVariables>
                                 <spring.profiles.active>backend-test</spring.profiles.active>
@@ -213,7 +206,6 @@
                     </execution>
                 </executions>
             </plugin>
-
 
             <plugin>
                 <!-- checkstyle -->
@@ -236,6 +228,31 @@
                         <version>${checkstyle.version}</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+
+            <plugin>
+                <!-- generates the code coverage report for sonar cube -->
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.14</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report-code-coverage</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <formats>XML</formats>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
