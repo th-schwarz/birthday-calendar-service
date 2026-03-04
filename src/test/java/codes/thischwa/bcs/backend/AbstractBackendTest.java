@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import codes.thischwa.bcs.Contact;
 import codes.thischwa.bcs.TestBcgApp;
-import codes.thischwa.bcs.conf.BcsConf;
 import codes.thischwa.bcs.conf.DavConf;
 import codes.thischwa.bcs.service.BirthdayCalGenerator;
 import codes.thischwa.bcs.service.CalUtil;
@@ -22,11 +21,11 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.MonthDay;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -39,6 +38,7 @@ import net.fortuna.ical4j.vcard.property.Fn;
 import net.fortuna.ical4j.vcard.property.N;
 import net.fortuna.ical4j.vcard.property.Uid;
 import net.fortuna.ical4j.vcard.property.Version;
+import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -48,15 +48,18 @@ import org.springframework.test.context.ActiveProfiles;
 @Slf4j
 public abstract class AbstractBackendTest {
 
+  @BeforeAll
+  static void init() {
+    Locale.setDefault(Locale.ENGLISH);
+  }
+
   static final int STARTUP_TIMEOUT_SEC = 180;
+
   @Autowired
   protected BirthdayCalGenerator generator;
 
   @Autowired
   protected DavConf davConf;
-
-  @Autowired
-  protected BcsConf bcsConf;
 
   @Autowired
   protected SardineInitializer sardineInitializer;
@@ -83,7 +86,7 @@ public abstract class AbstractBackendTest {
         .orElseThrow(() -> new AssertionError("Jane Doe's birthday event not found"));
     assertTrue(TemporalUtil.isSameBirthday(janeWithBirthDay.birthday(), bdEvent.getDateTimeStart().getDate()),
         "Jane Doe's birthday event should reflect the birthday");
-    assertEquals("Birthday: Mai 12" , bdEvent.getDescription().getValue(), "Jane Doe's birthday event should have the correct description");
+    assertEquals("Birthday: May 12", bdEvent.getDescription().getValue(), "Jane Doe's birthday event should have the correct description");
     bdEvent = eventsAfterFirstSync.stream()
         .filter(e -> e.getSummary().getValue().contains("John"))
         .findFirst()
@@ -107,7 +110,7 @@ public abstract class AbstractBackendTest {
     assertTrue(janeNew.isPresent(), "Jane's updated event not found after sync");
     bdEvent = janeNew.get();
     assumeTrue(TemporalUtil.isSameBirthday(janeNewBday, bdEvent.getDateTimeStart().getDate()), "Jane's updated event should reflect the changed birthday");
-    assertEquals("Birthday: Mai 13"  , bdEvent.getDescription().getValue(), "Jane Doe's birthday event should have the correct description");
+    assertEquals("Birthday: May 13", bdEvent.getDescription().getValue(), "Jane Doe's birthday event should have the correct description");
 
     // 6) Delete a contact with a birthday and verify event removal
     log.info("Step 6: Deleting John Smith contact and re-synchronizing");
