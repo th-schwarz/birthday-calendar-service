@@ -26,6 +26,9 @@ import org.apache.commons.io.IOUtils;
  */
 public class CardUtil {
 
+  private CardUtil() {
+  }
+
   /**
    * Converts a given VCard object into a Contact object, extracting relevant properties
    * such as first name, last name, display name, and birthday, and associating them with
@@ -61,7 +64,7 @@ public class CardUtil {
    * <p>This method extracts a unique identifier from the URI and uses it to
    * associate with the Contact object created from the VCard data.
    *
-   * @param vCardStream An InputStream containing VCard data. The stream must
+   * @param inCard An InputStream containing VCard data. The stream must
    *                    contain valid VCard data.
    * @param href        A URI used to extract a unique identifier for the
    *                    resulting Contact object.
@@ -71,9 +74,9 @@ public class CardUtil {
    * @throws ParserException If an error occurs during parsing of the VCard data.
    * @throws MissingBirthdayException If the VCard does not contain a valid birthday property.
    */
-  public static Contact buildContact(InputStream vCardStream, URI href) throws IOException, ParserException, MissingBirthdayException {
+  public static Contact buildContact(InputStream inCard, URI href) throws IOException, ParserException, MissingBirthdayException {
     String identifier = NetUtil.extractUuId(href.toURL());
-    return buildContact(vCardStream, identifier);
+    return buildContact(inCard, identifier);
   }
 
   /**
@@ -82,7 +85,7 @@ public class CardUtil {
    * <p>This method reads the VCard data from the input stream, parses it into a VCard object,
    * and then converts it into a Contact object using the provided identifier.
    *
-   * @param vCardStream An InputStream containing VCard data.
+   * @param inCard An InputStream containing VCard data.
    *                    The stream must contain a valid VCard format.
    * @param identifier  A unique string to associate with the resulting Contact object.
    * @return A Contact instance containing the information extracted from the VCard data.
@@ -90,9 +93,9 @@ public class CardUtil {
    * @throws ParserException If an error occurs during parsing of the VCard data.
    * @throws MissingBirthdayException If the VCard does not contain a valid birthday property.
    */
-  public static Contact buildContact(InputStream vCardStream, String identifier)
+  public static Contact buildContact(InputStream inCard, String identifier)
       throws IOException, ParserException, MissingBirthdayException {
-    byte[] vcfContent = IOUtils.toByteArray(vCardStream);
+    byte[] vcfContent = IOUtils.toByteArray(inCard);
     VCardBuilder cardBuilder =
         new VCardBuilder(new ByteArrayInputStream(vcfContent));
     VCard card = cardBuilder.build();

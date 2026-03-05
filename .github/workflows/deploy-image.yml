@@ -46,4 +46,3 @@ jobs:
           context: .
           push: true
           tags: ${{ env.IMAGE }}:${{ env.TAG }}
-          registry: ${{ env.REGISTRY }}

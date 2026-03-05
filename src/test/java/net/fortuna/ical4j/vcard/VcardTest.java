@@ -19,7 +19,7 @@ import net.fortuna.ical4j.vcard.property.Version;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class VcardTest {
+class VcardTest {
 
   @Test
   void testRead30BdFull() throws ParserException, IOException {
