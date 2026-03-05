@@ -28,8 +28,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Java and Maven
         uses: ./.github/actions/setup-java-maven/
@@ -51,6 +49,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           report-name: Summary of JUnit Tests
+
+      - name: Ensure full git history for SonarCloud
+        run: git fetch --unshallow || true
 
       - name: Sonar analysis
         env:
