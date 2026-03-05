@@ -4,11 +4,13 @@ import codes.thischwa.bcs.Contact;
 import codes.thischwa.bcs.conf.DavConf;
 import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import net.fortuna.ical4j.data.ParserException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -56,20 +58,24 @@ public class CardHandler {
             ? davResource.toString() : davResource.getDisplayName();
         log.info("Processing contact: {}", resourceName);
         URI href = new URI(davConf.getBaseUrl() + davResource.getHref().toString());
-        try (InputStream vCardStream = sardine.get(href.toString())) {
-          Contact contact = CardUtil.buildContact(vCardStream, href);
-          contacts.add(contact);
-        } catch (MissingBirthdayException mbe) {
-          log.debug(mbe.getMessage());
-        } catch (IllegalArgumentException e) {
-          log.warn("Error while processing contact {}: {}", resourceName,
-              e.getMessage());
-        }
+        readContactFromDav(sardine, href, contacts, resourceName);
       }
       log.info("Contacts with birthday found: {}", contacts.size());
       return contacts;
     } catch (Exception e) {
       throw new IllegalArgumentException(e);
+    }
+  }
+
+  private void readContactFromDav(Sardine sardine, URI href, List<Contact> contacts, String resourceName)
+      throws IOException, ParserException {
+    try (InputStream vCardStream = sardine.get(href.toString())) {
+      Contact contact = CardUtil.buildContact(vCardStream, href);
+      contacts.add(contact);
+    } catch (MissingBirthdayException mbe) {
+      log.debug(mbe.getMessage());
+    } catch (IllegalArgumentException e) {
+      log.warn("Error while processing contact {}: {}", resourceName, e.getMessage());
     }
   }
 }
