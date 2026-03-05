@@ -108,7 +108,7 @@ public class CalHandler {
     Map<String, Contact> existingContacts = new HashMap<>();
     contacts.forEach(contact -> existingContacts.put(contact.identifier(), contact));
 
-    eventData.existingEvents().keySet().forEach((eventUuid) -> {
+    eventData.existingEvents().keySet().forEach(eventUuid -> {
       if (!existingContacts.containsKey(eventUuid)) {
         deleteEvent(sardine, eventData.existingEventUris().get(eventUuid));
       }
