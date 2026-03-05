@@ -35,6 +35,6 @@ public record DavConf(
   }
 
   public long getRetryDelayInMillis() {
-    return retryDelayInSeconds * 1000;
+    return retryDelayInSeconds * 1000L;
   }
 }

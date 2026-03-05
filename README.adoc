@@ -9,6 +9,12 @@
 image:https://github.com/th-schwarz/birthday-calendar-service/actions/workflows/maven.yml/badge.svg["GitHub CI Build Status",link="https://github.com/th-schwarz/birthday-calendar-service/actions/workflows/maven.yml"]
 image:https://img.shields.io/github/license/th-schwarz/birthday-calendar-service["License badge for BirthdayCalendarService",link="https://github.com/th-schwarz/birthday-calendar-service/blob/develop/LICENSE"]
 
+image:https://sonarcloud.io/api/project_badges/measure?project=th-schwarz_birthday-calendar-service&metric=alert_status[Quality Gate Status,link=https://sonarcloud.io/summary/new_code?id=th-schwarz_birthday-calendar-service]
+image:https://sonarcloud.io/api/project_badges/measure?project=th-schwarz_birthday-calendar-service&metric=security_rating[Security Rating,link=https://sonarcloud.io/summary/new_code?id=th-schwarz_birthday-calendar-service]
+image:https://sonarcloud.io/api/project_badges/measure?project=th-schwarz_birthday-calendar-service&metric=coverage[Coverage,link=https://sonarcloud.io/summary/new_code?id=th-schwarz_birthday-calendar-service]
+image:https://sonarcloud.io/api/project_badges/measure?project=th-schwarz_birthday-calendar-service&metric=ncloc[Lines of Code,link=https://sonarcloud.io/summary/new_code?id=th-schwarz_birthday-calendar-service]
+image:https://sonarcloud.io/api/project_badges/measure?project=th-schwarz_birthday-calendar-service&metric=code_smells[Code Smells,link=https://sonarcloud.io/summary/new_code?id=th-schwarz_birthday-calendar-service]
+
 Give it a try!
 https://github.com/th-schwarz/birthday-calendar-service/releases[image:https://img.shields.io/github/v/release/th-schwarz/birthday-calendar-service?include_prereleases[GitHub
 release (latest by date including pre-releases)]]         image:https://img.shields.io/github/downloads/th-schwarz/birthday-calendar-service/total[GitHub Downloads (all assets, all releases)]
