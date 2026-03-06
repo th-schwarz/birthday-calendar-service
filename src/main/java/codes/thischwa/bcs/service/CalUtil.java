@@ -44,9 +44,6 @@ public class CalUtil {
     try {
       Property p = event.getProperty(Uid.UID).orElseThrow();
       String uuid = p.getValue();
-      if (uuid.endsWith(".vcf")) {
-        uuid = uuid.substring(0, uuid.lastIndexOf('.'));
-      }
       return uuid;
     } catch (NoSuchElementException e) {
       throw new IllegalArgumentException(e);

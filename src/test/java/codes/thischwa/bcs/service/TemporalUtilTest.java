@@ -1,10 +1,14 @@
 package codes.thischwa.bcs.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.time.MonthDay;
+import java.time.temporal.TemporalAccessor;
 import net.fortuna.ical4j.vcard.property.BDay;
 import org.junit.jupiter.api.Test;
 
@@ -114,5 +118,139 @@ class TemporalUtilTest {
     // Act & Assert
     assertEquals(MonthDay.of(1, 1), TemporalUtil.toMonthDay(birthday1));
     assertEquals(MonthDay.of(12, 31), TemporalUtil.toMonthDay(birthday2));
+  }
+
+  @Test
+  void testIsMonthDay_WithMonthDayFormat() {
+    BDay<?> birthday = new BDay<>("--0415");
+    assertTrue(TemporalUtil.isMonthDay(birthday));
+  }
+
+  @Test
+  void testIsMonthDay_WithLocalDate() {
+    BDay<LocalDate> birthday = new BDay<>(LocalDate.of(1990, 4, 15));
+    assertFalse(TemporalUtil.isMonthDay(birthday));
+  }
+
+  @Test
+  void testIsMonthDay_WithInvalidFormat() {
+    BDay<?> birthday = new BDay<>("04-15");
+    assertFalse(TemporalUtil.isMonthDay(birthday));
+  }
+
+  @Test
+  void testToEventDate_WithLocalDate() {
+    LocalDate date = LocalDate.of(2024, 4, 15);
+    LocalDate result = TemporalUtil.toEventDate(date);
+    assertEquals(date, result);
+  }
+
+  @Test
+  void testToEventDate_WithMonthDay() {
+    MonthDay monthDay = MonthDay.of(4, 15);
+    LocalDate result = TemporalUtil.toEventDate(monthDay);
+    assertEquals(4, result.getMonthValue());
+    assertEquals(15, result.getDayOfMonth());
+    assertEquals(LocalDate.now().getYear(), result.getYear());
+  }
+
+  @Test
+  void testToEventDate_WithUnsupportedType() {
+    assertThrows(IllegalArgumentException.class, () ->
+        TemporalUtil.toEventDate(java.time.LocalTime.now()));
+  }
+
+  @Test
+  void testToBday() {
+    MonthDay monthDay = MonthDay.of(4, 15);
+    BDay<?> result = TemporalUtil.toBday(monthDay);
+    assertEquals("--0415", result.getText());
+  }
+
+  @Test
+  void testToBday_WithSingleDigitMonthAndDay() {
+    MonthDay monthDay = MonthDay.of(1, 5);
+    BDay<?> result = TemporalUtil.toBday(monthDay);
+    assertEquals("--0105", result.getText());
+  }
+
+  @Test
+  void testToTemporal_WithMonthDay() {
+    BDay<?> birthday = new BDay<>("--0415");
+    TemporalAccessor result = TemporalUtil.toTemporal(birthday);
+    assertTrue(result instanceof MonthDay);
+    assertEquals(MonthDay.of(4, 15), result);
+  }
+
+  @Test
+  void testToTemporal_WithLocalDate() {
+    LocalDate date = LocalDate.of(1990, 4, 15);
+    BDay<LocalDate> birthday = new BDay<>(date);
+    TemporalAccessor result = TemporalUtil.toTemporal(birthday);
+    assertEquals(date, result);
+  }
+
+  @Test
+  void testIsSameBirthday_WithMonthDay() {
+    MonthDay contactBirthday = MonthDay.of(4, 15);
+    LocalDate eventDate = LocalDate.of(2024, 4, 15);
+    assertTrue(TemporalUtil.isSameBirthday(contactBirthday, eventDate));
+  }
+
+  @Test
+  void testIsSameBirthday_WithMonthDay_NotMatching() {
+    MonthDay contactBirthday = MonthDay.of(4, 15);
+    LocalDate eventDate = LocalDate.of(2024, 5, 15);
+    assertFalse(TemporalUtil.isSameBirthday(contactBirthday, eventDate));
+  }
+
+  @Test
+  void testIsSameBirthday_WithLocalDate() {
+    LocalDate contactBirthday = LocalDate.of(1990, 4, 15);
+    LocalDate eventDate = LocalDate.of(1990, 4, 15);
+    assertTrue(TemporalUtil.isSameBirthday(contactBirthday, eventDate));
+  }
+
+  @Test
+  void testIsSameBirthday_WithLocalDate_NotMatching() {
+    LocalDate contactBirthday = LocalDate.of(1990, 4, 15);
+    LocalDate eventDate = LocalDate.of(1991, 4, 15);
+    assertFalse(TemporalUtil.isSameBirthday(contactBirthday, eventDate));
+  }
+
+  @Test
+  void testAddDays_WithMonthDay() {
+    MonthDay monthDay = MonthDay.of(4, 15);
+    TemporalAccessor result = TemporalUtil.addDays(monthDay, 5);
+    assertInstanceOf(MonthDay.class, result);
+    assertEquals(MonthDay.of(4, 20), result);
+  }
+
+  @Test
+  void testAddDays_WithMonthDay_CrossingMonth() {
+    MonthDay monthDay = MonthDay.of(4, 28);
+    TemporalAccessor result = TemporalUtil.addDays(monthDay, 5);
+    assertInstanceOf(MonthDay.class, result);
+    assertEquals(MonthDay.of(5, 3), result);
+  }
+
+  @Test
+  void testAddDays_WithLocalDate() {
+    LocalDate date = LocalDate.of(2024, 4, 15);
+    TemporalAccessor result = TemporalUtil.addDays(date, 10);
+    assertEquals(LocalDate.of(2024, 4, 25), result);
+  }
+
+  @Test
+  void testAddDays_WithNegativeDays() {
+    LocalDate date = LocalDate.of(2024, 4, 15);
+    TemporalAccessor result = TemporalUtil.addDays(date, -5);
+    assertEquals(LocalDate.of(2024, 4, 10), result);
+  }
+
+  @Test
+  void testAddDays_WithUnsupportedType() {
+    assertThrows(IllegalArgumentException.class, () ->
+        TemporalUtil.addDays(java.time.LocalTime.now(), 5));
   }
 }
