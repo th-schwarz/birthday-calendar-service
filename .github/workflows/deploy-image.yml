@@ -23,27 +23,27 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Compute image and tags
+      - name: Compute image and tag
         run: |
           owner="${GITHUB_REPOSITORY_OWNER,,}"
           image="$REGISTRY/$owner/birthday-calendar-service"
-          tags=""
 
           if [ "${GITHUB_REF_NAME}" = "main" ]; then
-            tags="$image:latest"
-          elif [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            # Release tag like v1.0.0
-            version="${GITHUB_REF_NAME#v}"
-            tags="$image:${GITHUB_REF_NAME},$image:$version,$image:latest"
+            tag="latest"
+          else
+            tag="${GITHUB_REF_NAME,,}"
+            tag="${tag//\//-}"
+            tag="$(echo "$tag" | sed -E 's/[^a-z0-9._-]/-/g')"
           fi
 
           echo "IMAGE=$image" >> "$GITHUB_ENV"
-          echo "TAGS=$tags" >> "$GITHUB_ENV"
-          echo "Will push: $tags"
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+          echo "Will push $image:$tag"
 
       - name: Build and Push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ env.TAGS }}
+          tags: ${{ env.IMAGE }}:${{ env.TAG }}
+          registry: ${{ env.REGISTRY }}
