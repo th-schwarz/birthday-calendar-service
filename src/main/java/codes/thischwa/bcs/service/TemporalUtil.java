@@ -74,11 +74,11 @@ public final class TemporalUtil {
    *                                  nor a {@link MonthDay}.
    */
   public static LocalDate toEventDate(TemporalAccessor temporal) {
-    if (temporal instanceof LocalDate) {
-      return (LocalDate) temporal;
+    if (temporal instanceof LocalDate localDate) {
+      return localDate;
     }
-    if (temporal instanceof MonthDay) {
-      return ((MonthDay) temporal).atYear(LocalDate.now().getYear());
+    if (temporal instanceof MonthDay monthDay) {
+      return monthDay.atYear(LocalDate.now().getYear());
     }
     throw new IllegalArgumentException("Unsupported temporal type: " + temporal.getClass().getSimpleName());
   }
