@@ -19,8 +19,8 @@ image:https://github.com/th-schwarz/birthday-calendar-service/actions/workflows/
 {sonarSummaryURL}[image:{sonarBadgeURL}&metric=code_smells[Code Smells]]
 
 Give it a try!
-https://github.com/th-schwarz/birthday-calendar-service/releases[image:https://img.shields.io/github/v/release/th-schwarz/birthday-calendar-service?include_prereleases[GitHub
-release (latest by date including pre-releases)]]         image:https://img.shields.io/github/downloads/th-schwarz/birthday-calendar-service/total[GitHub Downloads (all assets, all releases)]
+https://github.com/th-schwarz/birthday-calendar-service/releases[image:https://img.shields.io/github/v/release/th-schwarz/birthday-calendar-service?include_prereleases[GitHub release (latest by date including pre-releases)]]
+image:https://img.shields.io/github/downloads/th-schwarz/birthday-calendar-service/total[GitHub Downloads (all assets, all releases)]
 image:https://ghcr-badge.elias.eu.org/shield/th-schwarz/birthday-calendar-service/birthday-calendar-service[]
 
 == Preface
