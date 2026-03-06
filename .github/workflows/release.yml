@@ -55,6 +55,11 @@ jobs:
           VERSION=${{ github.event.inputs.release_version }}
           TAG="v$VERSION"
           
-          # Point main branch to the same commit as the tag
+          # the following steps ar required to trigger 'deploy-image' for latest and versioned images
+
+          # step 1: Delete the existing main branch
+          git push origin --delete main || true
+
+          # step 2: Create a new main branch pointing to the tag's commit
           git checkout -b main $TAG
-          git push origin main --force
+          git push origin main
