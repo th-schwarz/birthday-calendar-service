@@ -2,7 +2,6 @@ package codes.thischwa.bcs.backend;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -27,11 +26,21 @@ public class SogoComposeTest extends AbstractBackendTest {
   private static final int SERVICE_PORT = 80;
   private static final String SERVICE_NAME = "nginx";
 
+  private static final DockerComposeConfig dockerConfig;
+
+  static {
+    try {
+      dockerConfig = prepareDockerCompose("sogo", "sogo");
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to prepare docker-compose for SOGO test", e);
+    }
+  }
+
   @Container
-  public static ComposeContainer sogo = new ComposeContainer(
-      new File("src/docker/sogo/docker-compose.yml"))
+  static ComposeContainer sogo = new ComposeContainer(dockerConfig.composeFile().toFile())
       .withLocalCompose(true)
       .withPull(true)
+      .withEnv("COMPOSE_PROJECT_DIRECTORY", dockerConfig.workingDir().toString())
       .withExposedService(
           SERVICE_NAME,
           SERVICE_PORT,
@@ -42,7 +51,7 @@ public class SogoComposeTest extends AbstractBackendTest {
       );
 
   @BeforeAll
-  public static void testIsRunning() throws IOException, InterruptedException {
+  static void testIsRunning() throws IOException, InterruptedException {
     String host = sogo.getServiceHost(SERVICE_NAME, SERVICE_PORT);
     Integer port = sogo.getServicePort(SERVICE_NAME, SERVICE_PORT);
     BASE_URL = "http://" + host + ":" + port + "/";

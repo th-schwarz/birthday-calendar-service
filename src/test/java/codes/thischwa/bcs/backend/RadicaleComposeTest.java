@@ -2,7 +2,6 @@ package codes.thischwa.bcs.backend;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.ComposeContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -28,11 +26,21 @@ public class RadicaleComposeTest extends AbstractBackendTest {
   private static final int SERVICE_PORT = 5232;
   private static final String SERVICE_NAME = "radicale-it";
 
+  private static final DockerComposeConfig dockerConfig;
+
+  static {
+    try {
+      dockerConfig = prepareDockerCompose("radicale", "radicale");
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to prepare docker-compose for Radicale test", e);
+    }
+  }
+
   @Container
-  public static ComposeContainer radicale = new ComposeContainer(
-      new File("src/docker/radicale/docker-compose.yml"))
+  private static ComposeContainer radicale = new ComposeContainer(dockerConfig.composeFile().toFile())
       .withLocalCompose(true)
       .withPull(true)
+      .withEnv("COMPOSE_PROJECT_DIRECTORY", dockerConfig.workingDir().toString())
       //.withLogConsumer(SERVICE_NAME, new Slf4jLogConsumer(log).withPrefix(SERVICE_NAME))
       .withExposedService(
           SERVICE_NAME,
@@ -43,7 +51,7 @@ public class RadicaleComposeTest extends AbstractBackendTest {
       );
 
   @BeforeAll
-  public static void testIsRunning() throws IOException {
+  static void testIsRunning() throws IOException {
     String host = radicale.getServiceHost(SERVICE_NAME, SERVICE_PORT);
     Integer port = radicale.getServicePort(SERVICE_NAME, SERVICE_PORT);
     BASE_URL = "http://" + host + ":" + port + "/";

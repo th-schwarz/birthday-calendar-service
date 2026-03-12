@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.temporal.TemporalAccessor;
@@ -54,6 +56,72 @@ public abstract class AbstractBackendTest {
   }
 
   static final int STARTUP_TIMEOUT_SEC = 180;
+
+  /**
+   * Container for docker-compose a file path and working directory.
+   */
+  protected record DockerComposeConfig(Path composeFile, Path workingDir) {
+  }
+
+  /**
+   * Prepares a temporary docker directory for testcontainers by copying src/docker
+   * to a temporary location.
+   *
+   * @param testPrefix prefix for the temporary directory name (e.g., "baikal", "sogo", "radicale")
+   * @param subdir     subdirectory within src/docker (e.g., "baikal", "sogo", "radicale")
+   * @return DockerComposeConfig containing the docker-compose.yml file path and working directory
+   * @throws IOException if copying fails
+   */
+  protected static DockerComposeConfig prepareDockerCompose(String testPrefix, String subdir) throws IOException {
+    Path sourceDockerDir = Path.of("src/docker");
+    Path tempDir = Files.createTempDirectory("bcs-test-" + testPrefix + "-");
+    Path targetDockerDir = tempDir.resolve("docker");
+
+    log.info("Copying {} to {}", sourceDockerDir, targetDockerDir);
+    copyDirectory(sourceDockerDir, targetDockerDir);
+
+    Path dockerComposeFile = targetDockerDir.resolve(subdir + "/docker-compose.yml");
+    Path workingDir = targetDockerDir.resolve(subdir);
+    log.info("Using docker-compose file: {}", dockerComposeFile);
+    log.info("Working directory: {}", workingDir);
+
+    return new DockerComposeConfig(dockerComposeFile, workingDir);
+  }
+
+  /**
+   * Recursively copies a directory from source to target.
+   * Skips symbolic links and socket files.
+   *
+   * @param source the source directory
+   * @param target the target directory
+   * @throws IOException if copying fails
+   */
+  protected static void copyDirectory(Path source, Path target) throws IOException {
+    Files.walk(source)
+        .forEach(sourcePath -> {
+          try {
+            // Skip symbolic links and socket files
+            if (Files.isSymbolicLink(sourcePath)) {
+              log.debug("Skipping symbolic link: {}", sourcePath);
+              return;
+            }
+
+            Path targetPath = target.resolve(source.relativize(sourcePath));
+            if (Files.isDirectory(sourcePath)) {
+              Files.createDirectories(targetPath);
+            } else {
+              // Skip socket files and other special files
+              if (!Files.isRegularFile(sourcePath)) {
+                log.debug("Skipping non-regular file: {}", sourcePath);
+                return;
+              }
+              Files.copy(sourcePath, targetPath);
+            }
+          } catch (IOException e) {
+            throw new RuntimeException("Failed to copy " + sourcePath, e);
+          }
+        });
+  }
 
   @Autowired
   protected BirthdayCalGenerator generator;
@@ -93,7 +161,8 @@ public abstract class AbstractBackendTest {
         .orElseThrow(() -> new AssertionError("John Smith's birthday event not found"));
     assertTrue(TemporalUtil.isSameBirthday(johnWithBirthday.birthday(), bdEvent.getDateTimeStart().getDate()),
         "John Smith's birthday event should reflect the birthday");
-    assertEquals("Birthday: 1985-11-03" , bdEvent.getDescription().getValue(), "John Smith's birthday event should have the correct description");
+    assertEquals("Birthday: 1985-11-03", bdEvent.getDescription().getValue(),
+        "John Smith's birthday event should have the correct description");
 
     // 5) Change the birthday of one contact and verify
     log.info("Step 5: Changing Jane Doe's birthday and re-synchronizing");
@@ -109,7 +178,8 @@ public abstract class AbstractBackendTest {
     Optional<VEvent> janeNew = eventsAfterChange.stream().filter(e -> e.getSummary().getValue().contains("Jane")).findFirst();
     assertTrue(janeNew.isPresent(), "Jane's updated event not found after sync");
     bdEvent = janeNew.get();
-    assumeTrue(TemporalUtil.isSameBirthday(janeNewBday, bdEvent.getDateTimeStart().getDate()), "Jane's updated event should reflect the changed birthday");
+    assumeTrue(TemporalUtil.isSameBirthday(janeNewBday, bdEvent.getDateTimeStart().getDate()),
+        "Jane's updated event should reflect the changed birthday");
     assertEquals("Birthday: May 13", bdEvent.getDescription().getValue(), "Jane Doe's birthday event should have the correct description");
 
     // 6) Delete a contact with a birthday and verify event removal
@@ -158,7 +228,7 @@ public abstract class AbstractBackendTest {
       if (contact.birthday() instanceof MonthDay) {
         bDay = TemporalUtil.toBday((MonthDay) contact.birthday());
       } else {
-        bDay= new BDay<>((LocalDate) contact.birthday());
+        bDay = new BDay<>((LocalDate) contact.birthday());
       }
       entity.add(bDay);
     }
