@@ -5,6 +5,7 @@
 /.factorypath
 /.springBeans
 /.idea
+/.claude
 *.iml
 
 # local files
