@@ -23,7 +23,7 @@ class SogoTest extends AbstractBackendTest {
   static void registerProperties(DynamicPropertyRegistry registry) {
     registry.add("dav.user", () -> DAV_USER);
     registry.add("dav.password", () -> DAV_PASS);
-    registry.add("dav.card-url", () -> DAV_CARD_URL);
+    registry.add("dav.card-urls[0]", () -> DAV_CARD_URL);
     registry.add("dav.cal-url", () -> DAV_CAL_URL);
   }
 

@@ -1,5 +1,6 @@
 package codes.thischwa.bcs.conf;
 
+import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -10,23 +11,23 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @param user                The username for authentication.
  * @param password            The password for authentication.
  * @param calUrl              The URL for accessing calendar services.
- * @param cardUrl             The URL for accessing address book services.
+ * @param cardUrls            The list of URLs for accessing address book services.
  * @param retryDelayInSeconds The delay in seconds for scheduled tasks or updates.
  * @param maxRetries          The maximum number of trials for a specific operation.
  */
 @ConfigurationProperties(prefix = "dav")
 public record DavConf(
-    String user, String password, String calUrl, String cardUrl, Integer retryDelayInSeconds,
+    String user, String password, String calUrl, List<String> cardUrls, Integer retryDelayInSeconds,
     Integer maxRetries) {
 
   /**
-   * Retrieves the base URL derived from the `cardUrl` property. It removes any path, query,
-   * or fragment components from the URL.
+   * Retrieves the base URL derived from the first entry of the `cardUrls` property. It removes any
+   * path, query, or fragment components from the URL.
    *
    * @return The base URL as a String.
    */
   public String getBaseUrl() {
-    return UriComponentsBuilder.fromUriString(cardUrl)
+    return UriComponentsBuilder.fromUriString(cardUrls.get(0))
         .replacePath(null)
         .replaceQuery(null)
         .fragment(null)

@@ -15,6 +15,7 @@ dav:
   user: dev
   password: strong
   cal-url: https://dav.my-domain.org/SOGo/dav/dav-user/Calendar/46-12345678-5-87654321/
-  card-url: https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/personal/
+  card-urls:
+    - https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/personal/
   max-retries: 5
   retry-delay-in-seconds: 1

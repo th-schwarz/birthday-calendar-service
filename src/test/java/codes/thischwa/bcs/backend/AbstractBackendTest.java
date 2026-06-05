@@ -169,7 +169,7 @@ public abstract class AbstractBackendTest {
     TemporalAccessor janeNewBday = TemporalUtil.addDays(janeWithBirthDay.birthday(), 1);
     Contact janeUpdated = new Contact(janeWithBirthDay.firstName(), janeWithBirthDay.lastName(),
         janeWithBirthDay.displayName(), janeNewBday, janeWithBirthDay.identifier());
-    putVCard(davConf.cardUrl() + janeWithBirthDay.identifier(), buildVCard(janeUpdated));
+    putVCard(davConf.cardUrls().get(0) + janeWithBirthDay.identifier(), buildVCard(janeUpdated));
     generator.processBirthdayEvents();
     List<VEvent> eventsAfterChange = listBirthdayEvents(sardine);
     assertEquals(2, eventsAfterChange.size(), "Expected exactly 2 birthday events");
@@ -184,7 +184,7 @@ public abstract class AbstractBackendTest {
 
     // 6) Delete a contact with a birthday and verify event removal
     log.info("Step 6: Deleting John Smith contact and re-synchronizing");
-    sardine.delete(davConf.cardUrl() + johnWithBirthday.identifier() + ".vcf");
+    sardine.delete(davConf.cardUrls().get(0) + johnWithBirthday.identifier() + ".vcf");
     generator.processBirthdayEvents();
 
     List<VEvent> eventsAfterDeletion = listBirthdayEvents(sardine);
@@ -204,16 +204,16 @@ public abstract class AbstractBackendTest {
   }
 
   void prepareRemote() throws IOException {
-    log.info("Step 1: Clearing remote address book at {}", davConf.cardUrl());
+    log.info("Step 1: Clearing remote address book at {}", davConf.cardUrls().get(0));
     clearRemoteCard();
 
     log.info("Step 2: Clearing remote calendar at {}", davConf.calUrl());
     clearRemoteCalendar();
 
     log.info("Step 3: Adding contacts (2 with birthdays, 1 without)");
-    putVCard(davConf.cardUrl() + janeWithBirthDay.identifier(), buildVCard(janeWithBirthDay));
-    putVCard(davConf.cardUrl() + johnWithBirthday.identifier(), buildVCard(johnWithBirthday));
-    putVCard(davConf.cardUrl() + richard.identifier(), buildVCard(richard));
+    putVCard(davConf.cardUrls().get(0) + janeWithBirthDay.identifier(), buildVCard(janeWithBirthDay));
+    putVCard(davConf.cardUrls().get(0) + johnWithBirthday.identifier(), buildVCard(johnWithBirthday));
+    putVCard(davConf.cardUrls().get(0) + richard.identifier(), buildVCard(richard));
   }
 
   private String buildVCard(Contact contact) {
@@ -259,7 +259,7 @@ public abstract class AbstractBackendTest {
    */
   void clearRemoteCard() throws IOException {
     Sardine sardine = sardineInitializer.getSardine();
-    List<DavResource> davResources = sardine.list(davConf.cardUrl());
+    List<DavResource> davResources = sardine.list(davConf.cardUrls().get(0));
     for (DavResource resource : davResources) {
       if (!resource.isDirectory()) {
         String path = davConf.getBaseUrl() + resource.getHref().getPath();

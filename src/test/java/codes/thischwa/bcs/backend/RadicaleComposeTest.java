@@ -72,7 +72,7 @@ public class RadicaleComposeTest extends AbstractBackendTest {
     registry.add("dav.user", () -> "dev-user");
     registry.add("dav.password", () -> "test123");
     // CardDAV (address book) and CalDAV (calendar) collections are pre-seeded in test data
-    registry.add("dav.card-url", () -> BASE_URL + "dev-user/d8d512ec-7535-840c-7141-00bc758d6296/");
+    registry.add("dav.card-urls[0]", () -> BASE_URL + "dev-user/d8d512ec-7535-840c-7141-00bc758d6296/");
     registry.add("dav.cal-url", () -> BASE_URL + "dev-user/c028244a-3c9c-d304-5e1e-2f80761d4e66/");
   }
 

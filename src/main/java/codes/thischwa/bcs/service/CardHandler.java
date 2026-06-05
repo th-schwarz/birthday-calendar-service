@@ -47,18 +47,21 @@ public class CardHandler {
     Sardine sardine = sardineInitializer.getSardine();
     List<Contact> contacts = new ArrayList<>();
     try {
-      List<DavResource> vcardResources = sardine.list(davConf.cardUrl())
-          .stream()
-          .filter(item -> !item.isDirectory())
-          .toList();
-      log.info("dav resources found to process: {}", vcardResources.size());
+      for (String cardUrl : davConf.cardUrls()) {
+        log.info("Reading contacts from: {}", cardUrl);
+        List<DavResource> vcardResources = sardine.list(cardUrl)
+            .stream()
+            .filter(item -> !item.isDirectory())
+            .toList();
+        log.info("dav resources found to process: {}", vcardResources.size());
 
-      for (DavResource davResource : vcardResources) {
-        String resourceName = (davResource.getDisplayName() == null || davResource.getDisplayName().isEmpty())
-            ? davResource.toString() : davResource.getDisplayName();
-        log.info("Processing contact: {}", resourceName);
-        URI href = new URI(davConf.getBaseUrl() + davResource.getHref().toString());
-        readContactFromDav(sardine, href, contacts, resourceName);
+        for (DavResource davResource : vcardResources) {
+          String resourceName = (davResource.getDisplayName() == null || davResource.getDisplayName().isEmpty())
+              ? davResource.toString() : davResource.getDisplayName();
+          log.info("Processing contact: {}", resourceName);
+          URI href = new URI(davConf.getBaseUrl() + davResource.getHref().toString());
+          readContactFromDav(sardine, href, contacts, resourceName);
+        }
       }
       log.info("Contacts with birthday found: {}", contacts.size());
       return contacts;

@@ -2,6 +2,7 @@ package codes.thischwa.bcs.conf;
 
 import codes.thischwa.bcs.AbstractTest;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,8 +22,8 @@ class DavConfTest extends AbstractTest {
         davConf.calUrl()
     );
     assertEquals(
-        "https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/personal/",
-        davConf.cardUrl()
+        List.of("https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/personal/"),
+        davConf.cardUrls()
     );
     assertEquals(2, davConf.retryDelayInSeconds());
     assertEquals(5, davConf.maxRetries());
