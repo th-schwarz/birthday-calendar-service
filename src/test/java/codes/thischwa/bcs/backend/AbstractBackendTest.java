@@ -169,7 +169,7 @@ public abstract class AbstractBackendTest {
     TemporalAccessor janeNewBday = TemporalUtil.addDays(janeWithBirthDay.birthday(), 1);
     Contact janeUpdated = new Contact(janeWithBirthDay.firstName(), janeWithBirthDay.lastName(),
         janeWithBirthDay.displayName(), janeNewBday, janeWithBirthDay.identifier());
-    putVCard(davConf.cardUrls().get(0) + janeWithBirthDay.identifier(), buildVCard(janeUpdated));
+    putVCard(davConf.getCardDavUris().stream().findFirst().orElseThrow().toString() + janeWithBirthDay.identifier(), buildVCard(janeUpdated));
     generator.processBirthdayEvents();
     List<VEvent> eventsAfterChange = listBirthdayEvents(sardine);
     assertEquals(2, eventsAfterChange.size(), "Expected exactly 2 birthday events");
@@ -184,7 +184,7 @@ public abstract class AbstractBackendTest {
 
     // 6) Delete a contact with a birthday and verify event removal
     log.info("Step 6: Deleting John Smith contact and re-synchronizing");
-    sardine.delete(davConf.cardUrls().get(0) + johnWithBirthday.identifier() + ".vcf");
+    sardine.delete(davConf.getCardDavUris().stream().findFirst().orElseThrow().toString() + johnWithBirthday.identifier() + ".vcf");
     generator.processBirthdayEvents();
 
     List<VEvent> eventsAfterDeletion = listBirthdayEvents(sardine);
@@ -204,16 +204,16 @@ public abstract class AbstractBackendTest {
   }
 
   void prepareRemote() throws IOException {
-    log.info("Step 1: Clearing remote address book at {}", davConf.cardUrls().get(0));
+    log.info("Step 1: Clearing remote address book at {}", davConf.getCardDavUris().stream().findFirst().orElseThrow().toString());
     clearRemoteCard();
 
-    log.info("Step 2: Clearing remote calendar at {}", davConf.calUrl());
+    log.info("Step 2: Clearing remote calendar at {}", davConf.getCalDavUri().toString());
     clearRemoteCalendar();
 
     log.info("Step 3: Adding contacts (2 with birthdays, 1 without)");
-    putVCard(davConf.cardUrls().get(0) + janeWithBirthDay.identifier(), buildVCard(janeWithBirthDay));
-    putVCard(davConf.cardUrls().get(0) + johnWithBirthday.identifier(), buildVCard(johnWithBirthday));
-    putVCard(davConf.cardUrls().get(0) + richard.identifier(), buildVCard(richard));
+    putVCard(davConf.getCardDavUris().stream().findFirst().orElseThrow().toString() + janeWithBirthDay.identifier(), buildVCard(janeWithBirthDay));
+    putVCard(davConf.getCardDavUris().stream().findFirst().orElseThrow().toString() + johnWithBirthday.identifier(), buildVCard(johnWithBirthday));
+    putVCard(davConf.getCardDavUris().stream().findFirst().orElseThrow().toString() + richard.identifier(), buildVCard(richard));
   }
 
   private String buildVCard(Contact contact) {
@@ -259,10 +259,10 @@ public abstract class AbstractBackendTest {
    */
   void clearRemoteCard() throws IOException {
     Sardine sardine = sardineInitializer.getSardine();
-    List<DavResource> davResources = sardine.list(davConf.cardUrls().get(0));
+    List<DavResource> davResources = sardine.list(davConf.getCardDavUris().stream().findFirst().orElseThrow().toString());
     for (DavResource resource : davResources) {
       if (!resource.isDirectory()) {
-        String path = davConf.getBaseUrl() + resource.getHref().getPath();
+        String path = davConf.baseUrl() + resource.getHref().getPath();
         sardine.delete(path);
         log.debug("Successfully deleted {}", path);
       }
@@ -286,7 +286,7 @@ public abstract class AbstractBackendTest {
 
   private Set<URI> getCalendarEntriesToDelete() throws IOException {
     Sardine sardine = sardineInitializer.getSardine();
-    List<DavResource> davResources = sardine.list(davConf.calUrl());
+    List<DavResource> davResources = sardine.list(davConf.getCalDavUri().toString());
     Set<URI> calendarEntries = new HashSet<>();
     for (DavResource resource : davResources) {
       if (resource.isDirectory()) {
@@ -304,14 +304,14 @@ public abstract class AbstractBackendTest {
   private void deleteCalendarEntries(Set<URI> calendarEntries) throws IOException {
     Sardine sardine = sardineInitializer.getSardine();
     for (URI uri : calendarEntries) {
-      String path = davConf.getBaseUrl() + uri.getPath();
+      String path = davConf.baseUrl() + uri.getPath();
       sardine.delete(path);
       log.debug("Successfully deleted {}", path);
     }
   }
 
   private List<VEvent> listBirthdayEvents(Sardine sardine) throws IOException {
-    Map<VEvent, URL> eventUrls = CalUtil.collectBirthdayEvents(sardine, davConf.calUrl());
+    Map<VEvent, URL> eventUrls = CalUtil.collectBirthdayEvents(sardine, davConf.getCalDavUri().toString());
     log.debug("Found {} birthday events.", eventUrls.size());
     return new ArrayList<>(eventUrls.keySet());
   }

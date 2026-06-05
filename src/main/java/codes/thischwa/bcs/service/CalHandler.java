@@ -70,13 +70,13 @@ public class CalHandler {
 
   void syncEventsWithBirthdayChanges(List<Contact> contacts) throws IOException {
     if (!sardineInitializer.canAccessBaseUrl()) {
-      log.error("Access to {} timed out after {} trails.", davConf.getBaseUrl(), davConf.maxRetries());
-      throw new IllegalArgumentException("Access to " + davConf.getBaseUrl() + " timed out.");
+      log.error("Access to {} timed out after {} trails.", davConf.baseUrl(), davConf.maxRetries());
+      throw new IllegalArgumentException("Access to " + davConf.baseUrl() + " timed out.");
     }
     Sardine sardine = sardineInitializer.getSardine();
     log.info("Syncing birthday events of {} contacts.", contacts.size());
 
-    Map<VEvent, URL> allBirthdayEvents = CalUtil.collectBirthdayEvents(sardine, davConf.calUrl());
+    Map<VEvent, URL> allBirthdayEvents = CalUtil.collectBirthdayEvents(sardine, davConf.getCalDavUri().toString());
     ExistingEventData eventData = buildExistingEventData(allBirthdayEvents);
 
     deleteOutdatedEvents(sardine, contacts, eventData);
@@ -117,7 +117,7 @@ public class CalHandler {
 
   private void deleteEvent(Sardine sardine, URL eventUri) {
     try {
-      sardine.delete(davConf.getBaseUrl() + eventUri.getPath());
+      sardine.delete(davConf.baseUrl() + eventUri.getPath());
       log.debug("Deleted outdated event: {}", eventUri.getPath());
     } catch (IOException e) {
       log.error("Failed to delete outdated event: {}", eventUri.getPath(), e);
@@ -148,7 +148,7 @@ public class CalHandler {
 
       if (existingEventUris.containsKey(uuid)) {
         URL eventUri = existingEventUris.get(uuid);
-        sardine.delete(davConf.getBaseUrl() + eventUri.getPath());
+        sardine.delete(davConf.baseUrl() + eventUri.getPath());
         log.debug("Deleted outdated event before add: {}", eventUri.getPath());
       }
 
@@ -216,7 +216,7 @@ public class CalHandler {
 
   private void uploadSingleEvent(Sardine sardine, Calendar calendar, Contact contact) throws IOException {
     String eventContent = calendar.toString();
-    String eventUrl = davConf.calUrl() + contact.identifier() + ".ics";
+    String eventUrl = davConf.getCalDavUri() + contact.identifier() + ".ics";
     // Use byte[] upload to ensure Content-Length is set (some servers reject chunked) and send a minimal Content-Type
     byte[] bytes = eventContent.getBytes(StandardCharsets.UTF_8);
     try {

@@ -16,21 +16,23 @@ class SogoTest extends AbstractBackendTest {
 
   private static final String DAV_USER = System.getenv("SOGO_DAV_USER");
   private static final String DAV_PASS = System.getenv("SOGO_DAV_PASS");
-  private static final String DAV_CARD_URL = System.getenv("SOGO_DAV_CARD_URL");
-  private static final String DAV_CAL_URL = System.getenv("SOGO_DAV_CAL_URL");
+  private static final String DAV_BASE_URL = System.getenv("SOGO_DAV_BASE_URL");
+  private static final String DAV_CARD_PATH = System.getenv("SOGO_DAV_CARD_PATH");
+  private static final String DAV_CAL_PATH = System.getenv("SOGO_DAV_CAL_PATH");
 
   @DynamicPropertySource
   static void registerProperties(DynamicPropertyRegistry registry) {
     registry.add("dav.user", () -> DAV_USER);
     registry.add("dav.password", () -> DAV_PASS);
-    registry.add("dav.card-urls[0]", () -> DAV_CARD_URL);
-    registry.add("dav.cal-url", () -> DAV_CAL_URL);
+    registry.add("dav.base-url", () -> DAV_BASE_URL);
+    registry.add("dav.card-paths[0]", () -> DAV_CARD_PATH);
+    registry.add("dav.cal-path", () -> DAV_CAL_PATH);
   }
 
   @BeforeEach
   void checkEnvironment() {
     boolean envSet =
-      DAV_USER != null && DAV_PASS != null && DAV_CARD_URL != null && DAV_CAL_URL != null;
+      DAV_USER != null && DAV_PASS != null && DAV_BASE_URL != null && DAV_CARD_PATH != null && DAV_CAL_PATH != null;
     if (!envSet) {
       log.warn("SOGo environment variables not set, skipping integration test");
     }

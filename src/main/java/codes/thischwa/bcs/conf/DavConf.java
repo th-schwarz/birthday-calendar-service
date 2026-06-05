@@ -1,8 +1,9 @@
 package codes.thischwa.bcs.conf;
 
+import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * Configuration properties for DAV integration. These properties are mapped from configuration
@@ -10,29 +11,27 @@ import org.springframework.web.util.UriComponentsBuilder;
  *
  * @param user                The username for authentication.
  * @param password            The password for authentication.
- * @param calUrl              The URL for accessing calendar services.
- * @param cardUrls            The list of URLs for accessing address book services.
+ * @param baseUrl             The base URL (schema://host(:port)) of the DAV server.
+ * @param calPath             The path for accessing calendar services.
+ * @param cardPaths           The list of paths for accessing address book services.
  * @param retryDelayInSeconds The delay in seconds for scheduled tasks or updates.
  * @param maxRetries          The maximum number of trials for a specific operation.
  */
 @ConfigurationProperties(prefix = "dav")
 public record DavConf(
-    String user, String password, String calUrl, List<String> cardUrls, Integer retryDelayInSeconds,
-    Integer maxRetries) {
+    String user, String password, String baseUrl, String calPath, List<String> cardPaths,
+    Integer retryDelayInSeconds, Integer maxRetries) {
 
-  /**
-   * Retrieves the base URL derived from the first entry of the `cardUrls` property. It removes any
-   * path, query, or fragment components from the URL.
-   *
-   * @return The base URL as a String.
-   */
-  public String getBaseUrl() {
-    return UriComponentsBuilder.fromUriString(cardUrls.get(0))
-        .replacePath(null)
-        .replaceQuery(null)
-        .fragment(null)
-        .build()
-        .toUriString();
+  public URI getBaseUri() {
+    return URI.create(baseUrl);
+  }
+
+  public URI getCalDavUri() {
+    return URI.create(getBaseUri() + calPath);
+  }
+
+  public Collection<URI> getCardDavUris() {
+    return cardPaths.stream().map(path -> URI.create(getBaseUri() + path)).toList();
   }
 
   public long getRetryDelayInMillis() {

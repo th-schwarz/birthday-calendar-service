@@ -45,9 +45,10 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
     log.info("  * active profile(s): {}", !StringUtils.hasText(profiles) ? "n/a" : profiles);
     log.info("  * cron: {}", config.cron());
     log.info("  * run on start: {}", config.runOnStart());
-    log.info("  * card-dav-urls: {}", davConf.cardUrls());
-    log.info("  * cal-dav-url: {}", davConf.calUrl());
-    log.info("  * user: {}", davConf.user());
+    log.info("  * dav base url: {}", davConf.baseUrl());
+    log.info("    * user: {}", davConf.user());
+    log.info("    * cal: {}", davConf.getCalDavUri());
+    davConf.getCardDavUris().forEach(uri -> log.info("    * card: {}", uri));
 
     if (config.runOnStart()) {
       try {

@@ -76,8 +76,9 @@ public class SogoComposeTest extends AbstractBackendTest {
     // These credentials are aligned with src/docker/sogo/config/init-users.sql
     registry.add("dav.user", () -> "dev-user");
     registry.add("dav.password", () -> "test123");
-    registry.add("dav.card-urls[0]", () -> BASE_URL + "SOGo/dav/dev-user/Contacts/personal/");
-    registry.add("dav.cal-url", () -> BASE_URL + "SOGo/dav/dev-user/Calendar/personal/");
+    registry.add("dav.base-url", () -> BASE_URL.replaceAll("/$", ""));
+    registry.add("dav.card-paths[0]", () -> "/SOGo/dav/dev-user/Contacts/personal/");
+    registry.add("dav.cal-path", () -> "/SOGo/dav/dev-user/Calendar/personal/");
   }
 
   @Test
