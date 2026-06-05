@@ -103,7 +103,8 @@ dav:
   user: dev
   password: strong
   cal-url: https://dav.my-domain.org/SOGo/dav/dav-user/Calendar/46-12345678-5-87654321/
-  card-url: https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/personal/
+  card-urls:
+    - https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/personal/
 ----
 
 - `bcs.calendar-category`: The value depends on the categories of the caldav server and its localization. +
@@ -111,7 +112,7 @@ dav:
 - `bcs.run-on-start`: Optional parameter, default is false. If it true, the sync starts immediately on start.
 - `bcs.cron`: The cron trigger used to schedule the synchronization of birthdays.
 - `dav.user`, `dav.password`: Authentication credentials for the dav server.
-- `dav.card-url`: The address book URL from which birthdays are read.
+- `dav.card-urls`: List of address book URLs from which birthdays are read.
 - `dav.cal-url`: The url of the birthday calendar which must be created. _To be on the safe side, it's a good idea to use an extra birthday calendar! But it is not mandatory since https://github.com/th-schwarz/birthday-calendar-service/issues/2[A remote event should only be deleted if its categories contain the defined birthday category.]_ was implemented.
 - `dav.delay-in-seconds`: This property determines the delay interval (in seconds) between retries in the case of network problems. The default setting is _1_.
 - `dav.retry-delay-in-seconds`: The maximum number of retries due to network errors. The default setting is _5_.

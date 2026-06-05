@@ -65,9 +65,10 @@ dav:
   user: dev
   password: strong
   cal-url: https://dav.my-domain.org/SOGo/dav/dav-user/Calendar/46-12345678-5-87654321/
-  card-url: https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/personal/
+  card-urls:
+    - https://dav.my-domain.org/SOGo/dav/dav-user/Contacts/personal/
 ----
 
 - `dav.user`, `dav.password`: Authentication credentials for the dav server.
-- `dav.card-url`: The address book URL from which birthdays are read.
+- `dav.card-urls`: List of address book URLs from which birthdays are read.
 - `dav.cal-url`: The url of the birthday calendar which must be created. _To be on the safe side, it's a good idea to use an extra birthday calendar! But it is not mandatory since https://github.com/th-schwarz/BirthdayCalendarCreator/issues/2[A remote event should only be deleted if its categories contain the defined birthday category.]_
