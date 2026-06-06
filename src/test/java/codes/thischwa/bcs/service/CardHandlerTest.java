@@ -31,8 +31,8 @@ class CardHandlerTest {
     sardineInitializer = mock(SardineInitializer.class);
     sardine = mock(Sardine.class);
 
-    when(davConf.getBaseUrl()).thenReturn("https://example.com");
-    when(davConf.cardUrl()).thenReturn("https://example.com/contacts/");
+    when(davConf.baseUrl()).thenReturn("https://example.com");
+    when(davConf.getCardDavUris()).thenReturn(List.of(URI.create("https://example.com/contacts/")));
     when(sardineInitializer.getSardine()).thenReturn(sardine);
 
     cardHandler = new CardHandler(davConf, sardineInitializer);

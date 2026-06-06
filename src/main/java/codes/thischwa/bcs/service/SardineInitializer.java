@@ -68,11 +68,11 @@ public class SardineInitializer {
   public boolean canAccessBaseUrl() {
     for (int i = 0; i < davConf.maxRetries(); i++) {
       try {
-        if (sardine.exists(davConf.getBaseUrl())) {
+        if (sardine.exists(davConf.baseUrl())) {
           return true;
         }
       } catch (IOException e) {
-        log.warn("Error while checking access to {} (trails: {}/{}): {}", davConf.getBaseUrl(),
+        log.warn("Error while checking access to {} (trails: {}/{}): {}", davConf.baseUrl(),
             i + 1, davConf.maxRetries(), e.getMessage());
       }
       try {

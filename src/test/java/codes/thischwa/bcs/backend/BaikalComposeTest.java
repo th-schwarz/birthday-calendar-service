@@ -64,8 +64,9 @@ public class BaikalComposeTest extends AbstractBackendTest {
   static void registerProperties(DynamicPropertyRegistry registry) {
     registry.add("dav.user", () -> "dev-user");
     registry.add("dav.password", () -> "test123");
-    registry.add("dav.card-url", () -> BASE_URL + "dav.php/addressbooks/dev-user/default/");
-    registry.add("dav.cal-url", () -> BASE_URL + "dav.php/calendars/dev-user/default/");
+    registry.add("dav.base-url", () -> BASE_URL.replaceAll("/$", ""));
+    registry.add("dav.card-paths[0]", () -> "/dav.php/addressbooks/dev-user/default/");
+    registry.add("dav.cal-path", () -> "/dav.php/calendars/dev-user/default/");
   }
 
   @Test

@@ -42,8 +42,9 @@ class CalHandlerTest {
     sardineInitializer = mock(SardineInitializer.class);
     sardine = mock(Sardine.class);
 
-    when(davConf.getBaseUrl()).thenReturn("https://example.com");
-    when(davConf.calUrl()).thenReturn("https://example.com/calendars/birthday/");
+    when(davConf.baseUrl()).thenReturn("https://example.com");
+    when(davConf.calPath()).thenReturn("/calendars/birthday/");
+    when(davConf.getCalDavUri()).thenReturn(URI.create("https://example.com/calendars/birthday/"));
     when(sardineInitializer.getSardine()).thenReturn(sardine);
     when(bcsConf.getProdId()).thenReturn("//Test//BCS//EN");
     when(bcsConf.calendarCategory()).thenReturn("BIRTHDAY");

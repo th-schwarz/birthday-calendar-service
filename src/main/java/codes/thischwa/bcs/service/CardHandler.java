@@ -40,25 +40,28 @@ public class CardHandler {
 
   List<Contact> readContactsWithBirthday() throws IllegalArgumentException {
     if (!sardineInitializer.canAccessBaseUrl()) {
-      log.error("Access to {} timed out after {} trails.", davConf.getBaseUrl(),
+      log.error("Access to {} timed out after {} trails.", davConf.baseUrl(),
           davConf.maxRetries());
-      throw new IllegalArgumentException("Access to " + davConf.getBaseUrl() + " timed out.");
+      throw new IllegalArgumentException("Access to " + davConf.baseUrl() + " timed out.");
     }
     Sardine sardine = sardineInitializer.getSardine();
     List<Contact> contacts = new ArrayList<>();
     try {
-      List<DavResource> vcardResources = sardine.list(davConf.cardUrl())
-          .stream()
-          .filter(item -> !item.isDirectory())
-          .toList();
-      log.info("dav resources found to process: {}", vcardResources.size());
+      for (URI cardUri : davConf.getCardDavUris()) {
+        log.info("Reading contacts from: {}", cardUri);
+        List<DavResource> vcardResources = sardine.list(cardUri.toString())
+            .stream()
+            .filter(item -> !item.isDirectory())
+            .toList();
+        log.info("dav resources found to process: {}", vcardResources.size());
 
-      for (DavResource davResource : vcardResources) {
-        String resourceName = (davResource.getDisplayName() == null || davResource.getDisplayName().isEmpty())
-            ? davResource.toString() : davResource.getDisplayName();
-        log.info("Processing contact: {}", resourceName);
-        URI href = new URI(davConf.getBaseUrl() + davResource.getHref().toString());
-        readContactFromDav(sardine, href, contacts, resourceName);
+        for (DavResource davResource : vcardResources) {
+          String resourceName = (davResource.getDisplayName() == null || davResource.getDisplayName().isEmpty())
+              ? davResource.toString() : davResource.getDisplayName();
+          log.info("Processing contact: {}", resourceName);
+          URI href = new URI(davConf.baseUrl() + davResource.getHref().toString());
+          readContactFromDav(sardine, href, contacts, resourceName);
+        }
       }
       log.info("Contacts with birthday found: {}", contacts.size());
       return contacts;
