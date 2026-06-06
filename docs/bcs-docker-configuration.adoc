@@ -20,7 +20,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
-      - LOGGING_CONFIG=/app/logback.xml  # only required when using logback.xml
+      - LOGGING_CONFIG=/app/logback.xml  # only required when using a custom logback.xml
 ----
 
 == logback.xml

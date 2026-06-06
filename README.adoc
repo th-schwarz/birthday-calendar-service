@@ -135,7 +135,7 @@ BCS can be run directly from a container image hosted on GitHub Container Regist
 # Run with configuration file mounted from the host
 docker run --rm \
   -v /path/to/bcs.yml:/app/bcs.yml:ro \
-  -v /path/to/logback.xml:/app/logback.xml:ro `# optional` \
+  -v /path/to/logback.xml:/app/logback.xml:ro  \
   ghcr.io/th-schwarz/birthday-calendar-service:[tagged-version]
 ----
 
@@ -154,7 +154,7 @@ If you want the application to run once and exit, you can append:
 ----
 docker run --rm \
   -v /path/to/bcs.yml:/app/bcs.yml:ro \
-  -v /path/to/logback.xml:/app/logback.xml:ro `# optional` \
+  -v /path/to/logback.xml:/app/logback.xml:ro \
   ghcr.io/th-schwarz/birthday-calendar-service:latest --run-once
 ----
 
