@@ -84,9 +84,10 @@ Here is the suggested file structure:
 ├── /opt/bcs
 │   ├── bcs.yml    (individual configuration)
 │   ├── bcs.jar
-│   ├── logback.xml    (logback configuration)
+│   ├── logback.xml    (logback configuration, optional)
 ----
 *bcs.yml* defines the individual properties. The file is read by default and will be merged with the default properties in the classpath; therefore, the file can be kept as small as possible. A minimal configuration example can be found further below. If the file is inside the working directory, it is loaded automatically.  +
+*logback.xml* is an optional Logback configuration file. If omitted, a console appender is used.  +
 The complete configuration settings can be found link:docs/bcs-configuration.adoc[here].
 
 === Configuration
@@ -134,11 +135,12 @@ BCS can be run directly from a container image hosted on GitHub Container Regist
 # Run with configuration file mounted from the host
 docker run --rm \
   -v /path/to/bcs.yml:/app/bcs.yml:ro \
-  -v /path/to/logback.xml:/app/logback.xml:ro \
+  -v /path/to/logback.xml:/app/logback.xml:ro `# optional` \
   ghcr.io/th-schwarz/birthday-calendar-service:[tagged-version]
 ----
 
-Replace `/path/to/bcs.yml` and `/path/to/logback.xml` with the absolute paths to your configuration and logging files on the host system.
+Replace `/path/to/bcs.yml` with the absolute path to your configuration file on the host system.
+The `-v /path/to/logback.xml` volume mount is optional; omit it to use  a simple console logger.
 
 Allowed values for `tagged-version`:
 
@@ -152,7 +154,7 @@ If you want the application to run once and exit, you can append:
 ----
 docker run --rm \
   -v /path/to/bcs.yml:/app/bcs.yml:ro \
-  -v /path/to/logback.xml:/app/logback.xml:ro \
+  -v /path/to/logback.xml:/app/logback.xml:ro `# optional` \
   ghcr.io/th-schwarz/birthday-calendar-service:latest --run-once
 ----
 
@@ -172,7 +174,7 @@ services:
       - ./logback.xml:/app/logback.xml:ro  # optional logging config
     # command: ["--run-once"]              # uncomment to run once and exit
     environment:
-      - LOGGING_CONFIG=/app/logback.xml    # required configuration
+      - LOGGING_CONFIG=/app/logback.xml    # only required when using logback.xml
     #   JAVA_TOOL_OPTIONS: -Xms128m -Xmx512m
     # user: "1000:1000"                    # drop root if desired
 ----
