@@ -1,9 +1,9 @@
 package codes.thischwa.bcs.conf;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * Configuration properties for DAV integration. These properties are mapped from configuration
@@ -23,15 +23,15 @@ public record DavConf(
     Integer retryDelayInSeconds, Integer maxRetries) {
 
   public URI getBaseUri() {
-    return URI.create(baseUrl);
+    return UriComponentsBuilder.fromUriString(baseUrl).build().toUri();
   }
 
   public URI getCalDavUri() {
-    return URI.create(getBaseUri() + calPath);
+    return UriComponentsBuilder.fromUriString(baseUrl).path(calPath).build().toUri();
   }
 
-  public Collection<URI> getCardDavUris() {
-    return cardPaths.stream().map(path -> URI.create(getBaseUri() + path)).toList();
+  public List<URI> getCardDavUris() {
+    return cardPaths.stream().map(path -> UriComponentsBuilder.fromUriString(baseUrl).path(path).build().toUri()).toList();
   }
 
   public long getRetryDelayInMillis() {

@@ -31,4 +31,10 @@ class DavConfTest extends AbstractTest {
     assertEquals(5, davConf.maxRetries());
   }
 
+  @Test
+  void testWithoutStartingSlashInUrlPath() {
+    DavConf dc = new DavConf("user", "password", "https://dav.my-domain.org", "calpath", List.of("cardpath"), 10, 3);
+    assertEquals("https://dav.my-domain.org/calpath", dc.getCalDavUri().toString());
+    assertEquals("https://dav.my-domain.org/cardpath", dc.getCardDavUris().get(0).toString());
+  }
 }
