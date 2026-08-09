@@ -38,7 +38,6 @@ public class RadicaleComposeTest extends AbstractBackendTest {
 
   @Container
   private static ComposeContainer radicale = new ComposeContainer(dockerConfig.composeFile().toFile())
-      .withLocalCompose(true)
       .withPull(true)
       .withEnv("COMPOSE_PROJECT_DIRECTORY", dockerConfig.workingDir().toString())
       //.withLogConsumer(SERVICE_NAME, new Slf4jLogConsumer(log).withPrefix(SERVICE_NAME))

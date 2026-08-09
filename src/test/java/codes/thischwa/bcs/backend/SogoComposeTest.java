@@ -38,7 +38,6 @@ public class SogoComposeTest extends AbstractBackendTest {
 
   @Container
   static ComposeContainer sogo = new ComposeContainer(dockerConfig.composeFile().toFile())
-      .withLocalCompose(true)
       .withPull(true)
       .withEnv("COMPOSE_PROJECT_DIRECTORY", dockerConfig.workingDir().toString())
       .withExposedService(

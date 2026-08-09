@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.3</version>
+        <version>4.1.0</version>
         <relativePath /> <!-- lookup parent -->
     </parent>
     <packaging>jar</packaging>
@@ -36,10 +36,10 @@
         <project.build.sourceEncoding>${file.encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${file.encoding}</project.reporting.outputEncoding>
 
-        <ical4j.version>4.2.3</ical4j.version>
+        <ical4j.version>4.3.0</ical4j.version>
         <ical4j-vcard.version>2.1.0</ical4j-vcard.version>
         <sardine.version>5.13</sardine.version>
-        <testcontainers.version>1.21.4</testcontainers.version>
+        <testcontainers.version>2.0.5</testcontainers.version>
 
         <!-- checkstyle -->
         <checkstyle.version>12.3.0</checkstyle.version>
@@ -127,7 +127,7 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>

@@ -39,7 +39,6 @@ public class BaikalComposeTest extends AbstractBackendTest {
 
   @Container
   static ComposeContainer baikal = new ComposeContainer(dockerConfig.composeFile().toFile())
-      .withLocalCompose(true)
       .withEnv("COMPOSE_PROJECT_DIRECTORY", dockerConfig.workingDir().toString())
       .withExposedService(SERVICE_NAME, SERVICE_PORT, Wait.forHttp("/")
           .forStatusCode(HttpStatus.SC_OK)
