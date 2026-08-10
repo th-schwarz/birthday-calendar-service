@@ -91,7 +91,7 @@ public final class TemporalUtil {
    * @param monthDay the {@code MonthDay} instance to be converted.
    * @return a {@code BDay} object representing the corresponding birthday.
    */
-  public static BDay<?> toBday(MonthDay monthDay) {
+  public static BDay<Temporal> toBday(MonthDay monthDay) {
     String monthDayStr = String.format("--%02d%02d", monthDay.getMonthValue(), monthDay.getDayOfMonth());
     return new BDay<>(monthDayStr);
   }
@@ -108,7 +108,7 @@ public final class TemporalUtil {
    *     the input represents a month-day pattern, or the date associated with the
    *     {@code BDay} object.
    */
-  public static TemporalAccessor toTemporal(BDay<?> birthDay) {
+  public static <T extends Temporal> TemporalAccessor toTemporal(BDay<T> birthDay) {
     if (isMonthDay(birthDay)) {
       return toMonthDay(birthDay);
     }
