@@ -1,11 +1,16 @@
 package codes.thischwa.bcs.backend;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
@@ -25,6 +30,8 @@ public class SogoComposeTest extends AbstractBackendTest {
   private static String BASE_URL;
   private static final int SERVICE_PORT = 80;
   private static final String SERVICE_NAME = "nginx";
+  private static final String CARD_PATH = "/SOGo/dav/dev-user/Contacts/personal/";
+  private static final String DAV_USER_CREDENTIALS = "dev-user:test123";
 
   private static final DockerComposeConfig dockerConfig;
 
@@ -56,18 +63,36 @@ public class SogoComposeTest extends AbstractBackendTest {
     BASE_URL = "http://" + host + ":" + port + "/";
     log.info("Base URL: {}", BASE_URL);
 
-    // Give SOGo additional time to fully initialize
-    log.info("Waiting additional 10 seconds for SOGo to fully initialize...");
-    Thread.sleep(10000);
+    // The web UI answers long before sogod can serve DAV requests (it returns 503 until its
+    // workers and the database are ready), so wait for the real CardDAV endpoint.
+    awaitDavReady();
+  }
 
-    // simple HTTP-Check
-    HttpURLConnection connection = (HttpURLConnection) new URL(BASE_URL + "SOGo/").openConnection();
-    connection.setRequestMethod("GET");
-    connection.setInstanceFollowRedirects(false);
-    int responseCode = connection.getResponseCode();
-
-    assertTrue(responseCode >= 200 && responseCode < 500,
-        "SOGo should be reachable over HTTP (2xx/3xx/4xx). Actual: " + responseCode);
+  private static void awaitDavReady() throws IOException, InterruptedException {
+    String auth = Base64.getEncoder().encodeToString(DAV_USER_CREDENTIALS.getBytes(StandardCharsets.UTF_8));
+    HttpRequest request = HttpRequest.newBuilder(URI.create(BASE_URL + CARD_PATH.substring(1)))
+        .method("PROPFIND", HttpRequest.BodyPublishers.noBody())
+        .header("Authorization", "Basic " + auth)
+        .header("Depth", "0")
+        .timeout(Duration.ofSeconds(10))
+        .build();
+    HttpClient client = HttpClient.newHttpClient();
+    Instant deadline = Instant.now().plus(Duration.ofSeconds(STARTUP_TIMEOUT_SEC));
+    int status = -1;
+    while (Instant.now().isBefore(deadline)) {
+      try {
+        status = client.send(request, HttpResponse.BodyHandlers.discarding()).statusCode();
+        if (status == HttpStatus.SC_MULTI_STATUS) {
+          log.info("SOGo CardDAV endpoint is ready");
+          return;
+        }
+        log.info("SOGo CardDAV endpoint not ready yet (status {}), retrying ...", status);
+      } catch (IOException e) {
+        log.info("SOGo CardDAV endpoint not reachable yet ({}), retrying ...", e.toString());
+      }
+      Thread.sleep(2000);
+    }
+    fail("SOGo CardDAV endpoint did not become ready in time. Last status: " + status);
   }
 
   @DynamicPropertySource
@@ -76,7 +101,7 @@ public class SogoComposeTest extends AbstractBackendTest {
     registry.add("dav.user", () -> "dev-user");
     registry.add("dav.password", () -> "test123");
     registry.add("dav.base-url", () -> BASE_URL.replaceAll("/$", ""));
-    registry.add("dav.card-paths[0]", () -> "/SOGo/dav/dev-user/Contacts/personal/");
+    registry.add("dav.card-paths[0]", () -> CARD_PATH);
     registry.add("dav.cal-path", () -> "/SOGo/dav/dev-user/Calendar/personal/");
   }
 
