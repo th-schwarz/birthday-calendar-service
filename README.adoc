@@ -218,3 +218,36 @@ Another possibility to start BCS is as `init.d` service. Further
 information can be found at the documentation of spring boot,
 https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#deployment.installing.nix-services.init-d[Installation
 as an init.d Service (System V)].
+
+== Known Alternatives
+
+There are other tools for getting contact birthdays into a calendar. Compared to them, BCS:
+
+* writes directly to a CalDAV calendar and keeps it in sync automatically (cron or `--run-once`),
+* updates changed events and removes outdated ones without creating duplicates, and only touches events carrying its own category,
+* reads from one or more CardDAV address books,
+* is tested in CI against SOGo, Baikal and Radicale,
+* runs as Docker container, systemd service, init.d service or plain jar.
+
+=== Automated tools
+
+* https://github.com/Adi146/ContactsBDayCalendar[ContactsBDayCalendar] -
+Python script (also as Docker image) that adds birthday events from a CardDAV address book to a CalDAV calendar.
+_BCS adds built-in scheduling, event matching and updating, and category-based cleanup of outdated events._
+* https://github.com/iBigQ/radicale-birthday-calendar[radicale-birthday-calendar] -
+server-side script for Radicale; runs as storage hook and updates the birthday calendar whenever a contact changes.
+_BCS runs independently of the server, so it needs no server-side hook, and it also works with SOGo and Baikal._
+* https://github.com/s-martin/birthday-ics[birthday-ics] -
+Docker service that generates a `birthdays.ics` from Nextcloud contacts via CardDAV once a day and serves it via a built-in web server.
+_BCS writes real events into a CalDAV calendar instead of providing a read-only ICS feed, and is not tied to Nextcloud._
+=== Manual converters (export, convert, import by hand)
+
+* https://github.com/escalate/google-contacts-birthday-ical-calendar[google-contacts-birthday-ical-calendar] -
+command line tool (also as Docker image) that converts a Google Contacts CSV export into an iCal file.
+_BCS needs no manual export and import and reads the contacts directly from the CardDAV server._
+* https://github.com/FoxP/VCF-to-ICS[VCF-to-ICS] -
+Python command line script that converts birthdays from VCF files to an ICS file.
+_BCS needs no manual export and import, and it synchronizes changes instead of producing a new file each time._
+* https://github.com/Weathermann/vcf2ics[vcf2ics] -
+simplified Python variant of VCF-to-ICS (reads the BDAY tag and writes the age into the event).
+_Same as above._
