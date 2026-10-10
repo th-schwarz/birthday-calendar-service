@@ -240,6 +240,7 @@ _BCS runs independently of the server, so it needs no server-side hook, and it a
 * https://github.com/s-martin/birthday-ics[birthday-ics] -
 Docker service that generates a `birthdays.ics` from Nextcloud contacts via CardDAV once a day and serves it via a built-in web server.
 _BCS writes real events into a CalDAV calendar instead of providing a read-only ICS feed, and is not tied to Nextcloud._
+
 === Manual converters (export, convert, import by hand)
 
 * https://github.com/escalate/google-contacts-birthday-ical-calendar[google-contacts-birthday-ical-calendar] -
