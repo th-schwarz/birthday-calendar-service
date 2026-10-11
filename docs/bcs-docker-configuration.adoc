@@ -3,7 +3,7 @@
 :toc:
 :toc-title:
 
-= BCG Configuration for Docker
+= BCS Configuration for Docker
 
 == docker-compose.yml
 

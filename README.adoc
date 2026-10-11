@@ -25,7 +25,7 @@ image:https://ghcr-badge.elias.eu.org/shield/th-schwarz/birthday-calendar-servic
 
 == Preface
 
-BirthdayCalendarService (BCS): A Java Spring Boot application that creates and synchronizes a birthday calendar from CardDAV address book data. BCS automatically generates recurring birthday events and maintains them through scheduled synchronization with CalDAV servers like SOGO and Baikal. Supports deployment via `command line`, `systemd`, `init.d`, or `Docker containers`.
+BirthdayCalendarService (BCS): A Java Spring Boot application that creates and synchronizes a birthday calendar from CardDAV address book data. BCS automatically generates recurring birthday events and maintains them through scheduled synchronization with CalDAV servers like SOGo, Baikal and Radicale. Supports deployment via `command line`, `systemd`, `init.d`, or `Docker containers`.
 
 Features:
 
@@ -87,7 +87,7 @@ Here is the suggested file structure:
 │   ├── logback.xml    (logback configuration, optional)
 ----
 *bcs.yml* defines the individual properties. The file is read by default and will be merged with the default properties in the classpath; therefore, the file can be kept as small as possible. A minimal configuration example can be found further below. If the file is inside the working directory, it is loaded automatically.  +
-*logback.xml* is an optional Logback configuration file. If omitted, a console appender is used.  +
+*logback.xml* is an optional Logback configuration file. If omitted, the bundled configuration with a console appender is used. A custom file is *not* picked up automatically: point to it with `--logging.config=/opt/bcs/logback.xml` or the environment variable `LOGGING_CONFIG`.  +
 The complete configuration settings can be found link:docs/bcs-configuration.adoc[here].
 
 === Configuration
@@ -100,6 +100,7 @@ The most important settings are:
 bcs:
   calendar-category: Birthday  # default
   cron: "0 30 4 * * *"  # default
+  run-on-start: false  # default
 dav:
   user: dev
   password: strong
@@ -111,14 +112,14 @@ dav:
 
 - `bcs.calendar-category`: The value depends on the categories of the caldav server and its localization. +
 *This value is used to delete and create birthday events, the value must be set correctly initially and must not be changed!*
-- `bcs.run-on-start`: Optional parameter, default is false. If it true, the sync starts immediately on start.
 - `bcs.cron`: The cron trigger used to schedule the synchronization of birthdays.
+- `bcs.run-on-start`: Optional parameter, default is false. If it is true, the sync starts immediately on start.
 - `dav.user`, `dav.password`: Authentication credentials for the DAV server.
 - `dav.base-url`: The base URL of the DAV server (`schema://host(:port)`). All paths below are relative to this server.
 - `dav.card-paths`: List of address book paths from which birthdays are read.
 - `dav.cal-path`: The path of the birthday calendar which must be created. _To be on the safe side, it's a good idea to use an extra birthday calendar! But it is not mandatory since https://github.com/th-schwarz/birthday-calendar-service/issues/2[A remote event should only be deleted if its categories contain the defined birthday category.]_ was implemented.
-- `dav.delay-in-seconds`: This property determines the delay interval (in seconds) between retries in the case of network problems. The default setting is _1_.
-- `dav.retry-delay-in-seconds`: The maximum number of retries due to network errors. The default setting is _5_.
+- `dav.retry-delay-in-seconds`: This property determines the delay interval (in seconds) between retries in the case of network problems. The default setting is _10_.
+- `dav.max-retries`: The maximum number of retries due to network errors. The default setting is _5_.
 
 There are additional settings for the birthday event. For further information have a look at the link:docs/bcs-configuration.adoc[Complete BCS Configuration].
 
@@ -136,26 +137,29 @@ BCS can be run directly from a container image hosted on GitHub Container Regist
 docker run --rm \
   -v /path/to/bcs.yml:/app/bcs.yml:ro \
   -v /path/to/logback.xml:/app/logback.xml:ro  \
+  -e LOGGING_CONFIG=/app/logback.xml \
   ghcr.io/th-schwarz/birthday-calendar-service:[tagged-version]
 ----
 
 Replace `/path/to/bcs.yml` with the absolute path to your configuration file on the host system.
-The `-v /path/to/logback.xml` volume mount is optional; omit it to use  a simple console logger.
+The `-v /path/to/logback.xml` volume mount and the `LOGGING_CONFIG` variable are optional (and only work together); omit both to use a simple console logger.
 
 Allowed values for `tagged-version`:
 
 - `latest` is built from the `main` branch.
 - `develop` is built from the `develop` branch.
-- `v0.2.0` is built from the tag `v0.2.0`.
-- `feature-xyz` is built from `feature/xyz` branch.
+- a release tag, e.g. `v0.2.0`, is built from the git tag of the same name.
+- `feature-xyz` is built from the `feature/xyz` branch (`/` is replaced by `-`).
 
-If you want the application to run once and exit, you can append:
+If you want the application to run once and exit, append the full command including `--run-once`
+(the image defines `java -jar bcs.jar` as default command, so a bare `--run-once` would replace it and fail):
 [source,bash]
 ----
 docker run --rm \
   -v /path/to/bcs.yml:/app/bcs.yml:ro \
   -v /path/to/logback.xml:/app/logback.xml:ro \
-  ghcr.io/th-schwarz/birthday-calendar-service:latest --run-once
+  -e LOGGING_CONFIG=/app/logback.xml \
+  ghcr.io/th-schwarz/birthday-calendar-service:latest java -jar bcs.jar --run-once
 ----
 
 === by Docker Compose
@@ -172,7 +176,7 @@ services:
     volumes:
       - ./bcs.yml:/app/bcs.yml:ro          # required configuration
       - ./logback.xml:/app/logback.xml:ro  # optional logging config
-    # command: ["--run-once"]              # uncomment to run once and exit
+    # command: ["java", "-jar", "bcs.jar", "--run-once"]  # uncomment to run once and exit
     environment:
       - LOGGING_CONFIG=/app/logback.xml    # only required when using logback.xml
     #   JAVA_TOOL_OPTIONS: -Xms128m -Xmx512m
@@ -188,7 +192,7 @@ docker compose up -d
 Run the container once and exit:
 [source,bash]
 ----
-docker compose run --rm bcs --run-once
+docker compose run --rm bcs java -jar bcs.jar --run-once
 ----
 
 === by Command Line
