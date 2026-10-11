@@ -20,7 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @DisplayName("RADICALE end-to-end test (docker-compose)")
 @Slf4j
-public class RadicaleComposeTest extends AbstractBackendTest {
+public class RadicaleTest extends AbstractBackendTest {
 
   private static String BASE_URL;
   private static final int SERVICE_PORT = 5232;

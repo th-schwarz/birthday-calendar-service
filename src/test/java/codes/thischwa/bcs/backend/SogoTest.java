@@ -25,7 +25,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @DisplayName("SOGO end-to-end test (docker-compose)")
 @Slf4j
-public class SogoComposeTest extends AbstractBackendTest {
+public class SogoTest extends AbstractBackendTest {
 
   private static String BASE_URL;
   private static final int SERVICE_PORT = 80;

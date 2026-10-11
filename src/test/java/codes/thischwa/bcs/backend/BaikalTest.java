@@ -20,7 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @DisplayName("BAIKAL end-to-end test (docker-compose)")
 @Slf4j
-public class BaikalComposeTest extends AbstractBackendTest {
+public class BaikalTest extends AbstractBackendTest {
 
   private static String BASE_URL;
 
