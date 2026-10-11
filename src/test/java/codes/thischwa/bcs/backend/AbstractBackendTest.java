@@ -3,6 +3,7 @@ package codes.thischwa.bcs.backend;
 import static codes.thischwa.bcs.service.CalHandler.CALENDAR_CONTENT_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -202,6 +203,7 @@ public abstract class AbstractBackendTest {
         .filter(e -> e.getSummary().getValue().contains("Jane"))
         .findFirst()
         .orElseThrow(() -> new AssertionError("Jane Doe's birthday event not found"));
+    assertInstanceOf(MonthDay.class, janeWithBirthDay.birthday(), "Jane Doe's birthday should be a MonthDay");
     assertTrue(TemporalUtil.isSameBirthday(janeWithBirthDay.birthday(), bdEvent.getDateTimeStart().getDate()),
         "Jane Doe's birthday event should reflect the birthday");
     assertEquals("Birthday: May 12", bdEvent.getDescription().getValue(), "Jane Doe's birthday event should have the correct description");

@@ -2,7 +2,6 @@ package codes.thischwa.bcs.conf;
 
 import codes.thischwa.bcs.Contact;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
@@ -95,6 +94,7 @@ public class EventConf {
   }
 
   private String replace(String template, Contact contact) {
+    assert contact.birthday() != null;
     String birthdayStr = (contact.birthday() instanceof MonthDay) ? formatterShort.format(contact.birthday()) :
         formatter.format(contact.birthday());
     return template.replace("~first-name~", contact.firstName())
