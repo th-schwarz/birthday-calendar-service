@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.ComposeContainer;
@@ -24,6 +23,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
+@DisplayName("SOGO end-to-end test (docker-compose)")
 @Slf4j
 public class SogoComposeTest extends AbstractBackendTest {
 
@@ -103,14 +103,5 @@ public class SogoComposeTest extends AbstractBackendTest {
     registry.add("dav.base-url", () -> BASE_URL.replaceAll("/$", ""));
     registry.add("dav.card-paths[0]", () -> CARD_PATH);
     registry.add("dav.cal-path", () -> "/SOGo/dav/dev-user/Calendar/personal/");
-  }
-
-  @Test
-  @DisplayName("SOGO end-to-end test (docker-compose)")
-  void completeProcess() throws Exception {
-    log.info("Starting SOGO end-to-end test using docker-compose CardDAV/CalDAV endpoints ...");
-    prepareRemote();
-
-    syncAndVerify();
   }
 }

@@ -16,6 +16,7 @@ import codes.thischwa.bcs.service.TemporalUtil;
 import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -41,14 +42,40 @@ import net.fortuna.ical4j.vcard.property.N;
 import net.fortuna.ical4j.vcard.property.Uid;
 import net.fortuna.ical4j.vcard.property.Version;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(classes = TestBcgApp.class)
 @ActiveProfiles("backend-test")
+@ExtendWith(AbstractBackendTest.RemoteLifecycleExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Slf4j
 public abstract class AbstractBackendTest {
+
+  @Autowired
+  protected BirthdayCalGenerator generator;
+
+  @Autowired
+  protected DavConf davConf;
+
+  @Autowired
+  protected SardineInitializer sardineInitializer;
+
+  private final Contact janeWithBirthDay = new Contact("Jane", "Doe", "J. Doe",
+      MonthDay.of(5, 12), "jane0000-0000-0000-0000-000000000000");
+  private final Contact johnWithBirthday = new Contact("John", "Smith", "J. Smith",
+      LocalDate.of(1985, 11, 3), "john0000-0000-0000-0000-000000000000");
+  private final Contact richard = new Contact("Richard", "Smith", "R. Smith", null, "rich0000-0000-0000-0000-000000000000");
 
   @BeforeAll
   static void init() {
@@ -60,8 +87,7 @@ public abstract class AbstractBackendTest {
   /**
    * Container for docker-compose a file path and working directory.
    */
-  protected record DockerComposeConfig(Path composeFile, Path workingDir) {
-  }
+  protected record DockerComposeConfig(Path composeFile, Path workingDir) {}
 
   /**
    * Prepares a temporary docker directory for testcontainers by copying src/docker
@@ -123,26 +149,50 @@ public abstract class AbstractBackendTest {
         });
   }
 
-  @Autowired
-  protected BirthdayCalGenerator generator;
+  /**
+   * Runs the remote preparation (steps 1-3) once before the first test of a test class and the
+   * remote cleanup (step 7) once after its last test, so that neither shows up as a test of its own.
+   */
+  static class RemoteLifecycleExtension implements BeforeEachCallback {
 
-  @Autowired
-  protected DavConf davConf;
+    private static final Namespace NAMESPACE = Namespace.create(RemoteLifecycleExtension.class);
 
-  @Autowired
-  protected SardineInitializer sardineInitializer;
+    @Override
+    public void beforeEach(ExtensionContext context) {
+      AbstractBackendTest test = (AbstractBackendTest) context.getRequiredTestInstance();
+      context.getParent().orElseThrow().getStore(NAMESPACE).computeIfAbsent("remote", key -> {
+        log.info("*** Starting end-to-end test: {}", test.getClass().getSimpleName());
+        try {
+          test.prepareRemote();
+        } catch (IOException e) {
+          throw new UncheckedIOException(e);
+        }
+        // closed by JUnit after the last test of the class, even if tests failed
+        return (AutoCloseable) test::cleanupRemote;
+      }, AutoCloseable.class);
+    }
+  }
 
-  private final Contact janeWithBirthDay = new Contact("Jane", "Doe", "J. Doe",
-      MonthDay.of(5, 12), "jane0000-0000-0000-0000-000000000000");
-  private final Contact johnWithBirthday = new Contact("John", "Smith", "J. Smith",
-      LocalDate.of(1985, 11, 3), "john0000-0000-0000-0000-000000000000");
-  private final Contact richard = new Contact("Richard", "Smith", "R. Smith", null, "rich0000-0000-0000-0000-000000000000");
+  private void prepareRemote() throws IOException {
+    log.info("Prepare step 1: Clearing remote address book at {}", davConf.getCardDavUris().stream().findFirst().orElseThrow().toString());
+    clearRemoteCard();
 
-  void syncAndVerify() throws Exception {
+    log.info("Prepare step 2: Clearing remote calendar at {}", davConf.getCalDavUri());
+    clearRemoteCalendar();
+
+    log.info("Prepare step 3: Adding contacts (2 with birthdays, 1 without)");
+    putVCard(davConf.getCardDavUris().stream().findFirst().orElseThrow() + janeWithBirthDay.identifier(), buildVCard(janeWithBirthDay));
+    putVCard(davConf.getCardDavUris().stream().findFirst().orElseThrow() + johnWithBirthday.identifier(), buildVCard(johnWithBirthday));
+    putVCard(davConf.getCardDavUris().stream().findFirst().orElseThrow() + richard.identifier(), buildVCard(richard));
+  }
+
+  @Test
+  @Order(1)
+  @DisplayName("Step 1: initial sync creates birthday events")
+  void initialSync() throws Exception {
     Sardine sardine = sardineInitializer.getSardine();
 
-    // 4) Run sync and verify 2 events
-    log.info("Step 4: Running BirthdayCalGenerator.processBirthdayEvents 1st time and verifying 2 events");
+    log.info("Step 1: Running BirthdayCalGenerator.processBirthdayEvents 1st time and verifying 2 events");
     generator.processBirthdayEvents();
     List<VEvent> eventsAfterFirstSync = listBirthdayEvents(sardine);
     assertEquals(2, eventsAfterFirstSync.size(), "Expected exactly 2 birthday events");
@@ -163,9 +213,15 @@ public abstract class AbstractBackendTest {
         "John Smith's birthday event should reflect the birthday");
     assertEquals("Birthday: 1985-11-03", bdEvent.getDescription().getValue(),
         "John Smith's birthday event should have the correct description");
+  }
 
-    // 5) Change the birthday of one contact and verify
-    log.info("Step 5: Changing Jane Doe's birthday and re-synchronizing");
+  @Test
+  @Order(2)
+  @DisplayName("Step 2: changed birthday updates the event")
+  void changedBirthdayIsSynced() throws Exception {
+    Sardine sardine = sardineInitializer.getSardine();
+
+    log.info("Step 2: Changing Jane Doe's birthday and re-synchronizing");
     TemporalAccessor janeNewBday = TemporalUtil.addDays(janeWithBirthDay.birthday(), 1);
     Contact janeUpdated = new Contact(janeWithBirthDay.firstName(), janeWithBirthDay.lastName(),
         janeWithBirthDay.displayName(), janeNewBday, janeWithBirthDay.identifier());
@@ -177,13 +233,19 @@ public abstract class AbstractBackendTest {
     // Check updated BDay
     Optional<VEvent> janeNew = eventsAfterChange.stream().filter(e -> e.getSummary().getValue().contains("Jane")).findFirst();
     assertTrue(janeNew.isPresent(), "Jane's updated event not found after sync");
-    bdEvent = janeNew.get();
+    VEvent bdEvent = janeNew.get();
     assumeTrue(TemporalUtil.isSameBirthday(janeNewBday, bdEvent.getDateTimeStart().getDate()),
         "Jane's updated event should reflect the changed birthday");
     assertEquals("Birthday: May 13", bdEvent.getDescription().getValue(), "Jane Doe's birthday event should have the correct description");
+  }
 
-    // 6) Delete a contact with a birthday and verify event removal
-    log.info("Step 6: Deleting John Smith contact and re-synchronizing");
+  @Test
+  @Order(3)
+  @DisplayName("Step 3: deleted contact removes the event")
+  void deletedContactRemovesEvent() throws Exception {
+    Sardine sardine = sardineInitializer.getSardine();
+
+    log.info("Step 3: Deleting John Smith contact and re-synchronizing");
     sardine.delete(davConf.getCardDavUris().stream().findFirst().orElseThrow().toString() + johnWithBirthday.identifier() + ".vcf");
     generator.processBirthdayEvents();
 
@@ -195,25 +257,13 @@ public abstract class AbstractBackendTest {
     boolean janeEventStillExists =
         eventsAfterDeletion.stream().anyMatch(e -> e.getSummary().getValue().contains("Jane"));
     assumeTrue(janeEventStillExists, "Jane Doe's birthday event should still exist");
+  }
 
-    log.info("*** All steps completed successfully for: {}", this.getClass().getSimpleName());
-
+  private void cleanupRemote() throws IOException {
     clearRemoteCalendar();
     clearRemoteCard();
     log.info("Step 7: Remote cleanup completed");
-  }
-
-  void prepareRemote() throws IOException {
-    log.info("Step 1: Clearing remote address book at {}", davConf.getCardDavUris().stream().findFirst().orElseThrow().toString());
-    clearRemoteCard();
-
-    log.info("Step 2: Clearing remote calendar at {}", davConf.getCalDavUri().toString());
-    clearRemoteCalendar();
-
-    log.info("Step 3: Adding contacts (2 with birthdays, 1 without)");
-    putVCard(davConf.getCardDavUris().stream().findFirst().orElseThrow().toString() + janeWithBirthDay.identifier(), buildVCard(janeWithBirthDay));
-    putVCard(davConf.getCardDavUris().stream().findFirst().orElseThrow().toString() + johnWithBirthday.identifier(), buildVCard(johnWithBirthday));
-    putVCard(davConf.getCardDavUris().stream().findFirst().orElseThrow().toString() + richard.identifier(), buildVCard(richard));
+    log.info("*** All steps completed successfully for: {}", this.getClass().getSimpleName());
   }
 
   private String buildVCard(Contact contact) {

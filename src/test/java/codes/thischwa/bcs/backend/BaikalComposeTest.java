@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.ComposeContainer;
@@ -19,6 +18,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
+@DisplayName("BAIKAL end-to-end test (docker-compose)")
 @Slf4j
 public class BaikalComposeTest extends AbstractBackendTest {
 
@@ -66,14 +66,5 @@ public class BaikalComposeTest extends AbstractBackendTest {
     registry.add("dav.base-url", () -> BASE_URL.replaceAll("/$", ""));
     registry.add("dav.card-paths[0]", () -> "/dav.php/addressbooks/dev-user/default/");
     registry.add("dav.cal-path", () -> "/dav.php/calendars/dev-user/default/");
-  }
-
-  @Test
-  @DisplayName("BAIKAL end-to-end test (docker-compose)")
-  void completeProcess() throws Exception {
-    log.info("Starting BAIKAL end-to-end test using docker-compose CardDAV/CalDAV endpoints ...");
-    prepareRemote();
-
-    syncAndVerify();
   }
 }
