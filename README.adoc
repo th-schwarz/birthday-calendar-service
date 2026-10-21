@@ -61,7 +61,7 @@ The Birthday Calendar Service (BCS) is an application designed to generate a bir
 === General Steps
 
 . Address Book Access
-* The application fetches all contacts from the specified address book URL and processes each contact to extract relevant information, such as names and birthdays.
+* The application fetches all contacts from one or more configured address books (see `dav.card-paths`) and processes each contact to extract relevant information, such as names and birthdays.
 
 . Event Processing
 * The collected birthday data is processed to create calendar events. Each contact's birthday is transformed into a recurring event that adheres to the iCalendar format.
