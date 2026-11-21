@@ -108,7 +108,7 @@
         </dependency>
 
         <dependency>
-            <!-- Nullness annotations (JSpecify) -->
+            <!-- Nullness annotations (jspecify) -->
             <groupId>org.jspecify</groupId>
             <artifactId>jspecify</artifactId>
             <scope>provided</scope>

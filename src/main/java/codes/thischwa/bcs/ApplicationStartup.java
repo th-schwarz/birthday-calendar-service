@@ -42,7 +42,7 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
   public void onApplicationEvent(final ApplicationReadyEvent event) {
     String profiles = String.join(",", env.getActiveProfiles());
     log.info("*** Settings for BCS:");
-    log.info("  * active profile(s): {}", !StringUtils.hasText(profiles) ? "n/a" : profiles);
+    log.info("  * active profile(s): {}", StringUtils.hasText(profiles) ? profiles : "n/a");
     log.info("  * cron: {}", config.cron());
     log.info("  * run on start: {}", config.runOnStart());
     log.info("  * dav base url: {}", davConf.baseUrl());
