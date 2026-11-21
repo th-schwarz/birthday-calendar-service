@@ -3,6 +3,11 @@ name: Build and Push to GHCR
 on:
   push:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: true
 
 jobs:
   build-and-push:
@@ -15,6 +20,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -24,14 +31,16 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Compute image and tag
+        env:
+          IMAGE_REF_NAME: ${{ inputs.ref || github.ref_name }}
         run: |
           owner="${GITHUB_REPOSITORY_OWNER,,}"
           image="$REGISTRY/$owner/birthday-calendar-service"
 
-          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+          if [ "${IMAGE_REF_NAME}" = "main" ]; then
             tag="latest"
           else
-            tag="${GITHUB_REF_NAME,,}"
+            tag="${IMAGE_REF_NAME,,}"
             tag="${tag//\//-}"
             tag="$(echo "$tag" | sed -E 's/[^a-z0-9._-]/-/g')"
           fi

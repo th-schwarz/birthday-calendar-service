@@ -18,4 +18,4 @@ jobs:
         uses: ./.github/actions/setup-java-maven
 
       - name: Run SOGo Tests
-        run: mvn clean test -B -Dtest=SogoComposeTest
+        run: mvn clean verify -B -Dit.test=SogoTest
