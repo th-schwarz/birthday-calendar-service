@@ -32,18 +32,24 @@ jobs:
 
       - name: Compute image and tag
         env:
-          IMAGE_REF_NAME: ${{ inputs.ref || github.ref_name }}
+          IMAGE_REF: ${{ inputs.ref || github.ref }}
         run: |
           owner="${GITHUB_REPOSITORY_OWNER,,}"
           image="$REGISTRY/$owner/birthday-calendar-service"
 
-          if [ "${IMAGE_REF_NAME}" = "main" ]; then
-            tag="latest"
-          else
-            tag="${IMAGE_REF_NAME,,}"
-            tag="${tag//\//-}"
-            tag="$(echo "$tag" | sed -E 's/[^a-z0-9._-]/-/g')"
-          fi
+          case "$IMAGE_REF" in
+            refs/heads/main) tag="latest" ;;
+            refs/heads/*|refs/tags/*)
+              kind="${IMAGE_REF#refs/}"
+              kind="${kind%%/*}"
+              name="${IMAGE_REF#refs/*/}"
+              name="${name,,}"
+              name="$(printf '%s' "$name" | sed -E 's/[^a-z0-9._-]/-/g')"
+              digest="$(printf '%s' "$IMAGE_REF" | sha256sum | cut -c1-16)"
+              tag="${kind}-${name:0:104}-${digest}"
+              ;;
+            *) echo "Unsupported image ref: $IMAGE_REF" >&2; exit 1 ;;
+          esac
 
           echo "IMAGE=$image" >> "$GITHUB_ENV"
           echo "TAG=$tag" >> "$GITHUB_ENV"

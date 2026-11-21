@@ -45,15 +45,17 @@ jobs:
 
       - name: Publish Test Report
         uses: ./.github/actions/publish-report/
-        if: ${{ always() }}
+        if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           report-name: Summary of JUnit Tests
 
       - name: Ensure full git history for SonarCloud
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
         run: git fetch --unshallow || true
 
       - name: Sonar analysis
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

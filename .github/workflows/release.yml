@@ -19,6 +19,17 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: Validate release versions
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
+          NEXT_SNAPSHOT_VERSION: ${{ inputs.next_snapshot_version }}
+        run: |
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] ||
+             [[ ! "$NEXT_SNAPSHOT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
+            echo "Expected release version X.Y.Z and next version X.Y.Z-SNAPSHOT" >&2
+            exit 1
+          fi
+
       - name: Checkout develop branch
         uses: actions/checkout@v4
         with:
@@ -37,10 +48,13 @@ jobs:
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
 
       - name: Maven Release Prepare
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
+          NEXT_SNAPSHOT_VERSION: ${{ inputs.next_snapshot_version }}
         run: |
           mvn release:prepare \
-            -DreleaseVersion=${{ github.event.inputs.release_version }} \
-            -DdevelopmentVersion=${{ github.event.inputs.next_snapshot_version }} \
+            "-DreleaseVersion=$RELEASE_VERSION" \
+            "-DdevelopmentVersion=$NEXT_SNAPSHOT_VERSION" \
             -Darguments="-DskipTests -Dcheckstyle.skip" \
             -B
 
@@ -50,10 +64,12 @@ jobs:
             -Darguments="-DskipTests -Dcheckstyle.skip -Dmaven.deploy.skip=true" \
             -B
 
-      - name: Merge develop into main
+      - name: Merge release tag into main
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
         run: |
           git checkout main
-          git merge --no-ff v${{ github.event.inputs.release_version }}
+          git merge --no-ff "v$RELEASE_VERSION"
           git push origin main
 
   publish-image:
@@ -63,5 +79,5 @@ jobs:
       packages: write
     uses: ./.github/workflows/deploy-image.yml
     with:
-      ref: main
+      ref: refs/heads/main
 
